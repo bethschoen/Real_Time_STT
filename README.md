@@ -15,6 +15,7 @@ In addition to this, **this program doesn't work on machines with Zscalar**. Thi
 ## Requirements
  - An Azure Subscription with a deployed Azure Speech Services resource.
  - A .env file in the project directory with a key to the Azure resource.
+ - FFMPEG executable saved locally for conversion of audio to .wav
  - A device with a microphone (although, I'd be surprised if you found one without)
  - The project is running on a machine without **Zscalar**. 
 
