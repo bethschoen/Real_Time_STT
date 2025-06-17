@@ -39,6 +39,28 @@ def convert_audio_to_wav(audio_path: str, save_path: str):
     except subprocess.CalledProcessError as e:
         logger.info(f"FFmpeg conversion failed: {e}")
         return jsonify({"error": "Audio conversion failed"}), 400
+    
+def check_result_from_azure(speech_recognition_result):
+    """
+    Having received a result from Azure, check whether it worked or not
+    """
+    if speech_recognition_result.reason == speechsdk.ResultReason.RecognizedSpeech:
+        logger.info("Recognized: {}".format(speech_recognition_result.text))
+        return jsonify({"transcript": speech_recognition_result.text}), 200
+   
+    elif speech_recognition_result.reason == speechsdk.ResultReason.NoMatch:
+        logger.info("No speech could be recognized: {}".format(speech_recognition_result.no_match_details))
+        return jsonify({"error": "Could not recognize speech"}), 400
+   
+    elif speech_recognition_result.reason == speechsdk.ResultReason.Canceled:
+        cancellation_details = speech_recognition_result.cancellation_details
+        logger.info("Speech Recognition canceled: {}".format(cancellation_details.reason))
+
+        if cancellation_details.reason == speechsdk.CancellationReason.Error:
+            logger.info("Error details: {}".format(cancellation_details.error_details))
+            logger.info("Did you set the speech resource key and endpoint values?")
+
+        return jsonify({"error": "Could not recognize speech"}), 400
 
 
 @app.route("/transcribe", methods=["POST"])
@@ -81,23 +103,7 @@ def transcribe():
         os.remove(audio_path)
     logger.info("Audio removed locally")
 
-    if speech_recognition_result.reason == speechsdk.ResultReason.RecognizedSpeech:
-        logger.info("Recognized: {}".format(speech_recognition_result.text))
-        return jsonify({"transcript": speech_recognition_result.text})
-   
-    elif speech_recognition_result.reason == speechsdk.ResultReason.NoMatch:
-        logger.info("No speech could be recognized: {}".format(speech_recognition_result.no_match_details))
-        return jsonify({"error": "Could not recognize speech"}), 400
-   
-    elif speech_recognition_result.reason == speechsdk.ResultReason.Canceled:
-        cancellation_details = speech_recognition_result.cancellation_details
-        logger.info("Speech Recognition canceled: {}".format(cancellation_details.reason))
-
-        if cancellation_details.reason == speechsdk.CancellationReason.Error:
-            logger.info("Error details: {}".format(cancellation_details.error_details))
-            logger.info("Did you set the speech resource key and endpoint values?")
-
-        return jsonify({"error": "Could not recognize speech"}), 400
+    return check_result_from_azure(speech_recognition_result)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
