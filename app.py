@@ -67,7 +67,7 @@ def check_result_from_azure(speech_recognition_result):
 def transcribe():
     logger.info("Start transcribe route...")
     file = request.files["audio"]
-    input_path = "input.wav"
+    input_path = "audio/input.wav"
     file.save(input_path)
     logger.info("Audio stored locally")  
 
@@ -75,7 +75,7 @@ def transcribe():
     original_filename = file.filename.lower()      
     needs_conversion = not original_filename.endswith(".wav")
     if needs_conversion:
-        converted_path = "converted.wav"
+        converted_path = "audio/converted.wav"
         convert_audio_to_wav(input_path, converted_path)
         audio_path = converted_path
     else:
