@@ -6,24 +6,32 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <div class="main-content">
-        <h1>Upload or Record Audio</h1>
-
-        <form id="upload-form" enctype="multipart/form-data">
-            <input type="file" name="audio" accept="audio/*" required />
-            <button type="submit">Transcribe</button>
-        </form>
-
-        <h2>Or Record:</h2>
-        <button id="record-btn">Start Recording</button>
-        <button id="stop-btn" disabled>Stop & Transcribe</button>
-
-        <h2>Transcript:</h2> <span id="transcript"></span>
-
-        <p><strong>Previous Transcripts</strong>
-        <ul id="transcript-history"></ul>
-
+  <h1 style="text-align: center;">Audio Transcription</h1>
+  <div class="container">
+    <div class="half-width left-box">
+      <h2>Upload Audio</h2>
+      <form id="upload-form" enctype="multipart/form-data">
+        <input type="file" name="audio" accept="audio/*" required />
+        <button type="submit">Transcribe</button>
+      </form>
     </div>
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+
+    <div class="half-width right-box">
+      <h2>Record Audio</h2>
+      <button id="record-btn">Start Recording</button>
+      <button id="stop-btn" disabled>Stop & Transcribe</button>
+    </div>
+  </div>
+
+  <!-- 📌 Transcript Section now inside a nicely padded container -->
+  <div class="transcriptions">
+    <h2>Transcript</h2>
+    <p id="transcript"></p>
+
+    <h3>Previous Transcripts</h3>
+    <ul id="transcript-history"></ul>
+  </div>
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
