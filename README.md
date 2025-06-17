@@ -1,7 +1,7 @@
 # (Almost) Real-Time Speech-to-Text Transcription
 This app is for transcribing audio via Azure Speech Services. The app allows you to either upload audio files or record audio using your device's microphone. 
 
-![diagram plot](images/Screenshot%202025-06-16.png)
+![diagram plot](images/Screenshot%202025-06-17.png)
 
 ##  Limitations
 This demo lets users record or upload audio and see a transcript almost immediately. When a user records audio, JavaScript is used to access the microphone and create a recording, this is saved in memory to be sent as an uploaded file to Azure. Therefore, **transcriptions aren't live but are almost real-time**. 
