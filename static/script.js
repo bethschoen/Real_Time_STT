@@ -5,17 +5,17 @@ const transcriptHistory = document.getElementById("transcript-history");
 
 const transcripts = [];  // Store all transcripts this session
 
-function addTranscriptToHistory(text) {
+function addTranscriptToHistory(text, inputType) {
   const timestamp = new Date();
-  const transcriptObj = { text, timestamp };
+  const transcriptObj = { text, inputType, timestamp };
   transcripts.unshift(transcriptObj); // add to start of array (newest first)
 
   // Clear and rebuild list
   transcriptHistory.innerHTML = ""; 
-  transcripts.forEach(({ text, timestamp }) => {
+  transcripts.forEach(({ text, inputType, timestamp }) => {
     const li = document.createElement("li");
     const formattedTime = timestamp.toLocaleString(); // format for display
-    li.textContent = `[${formattedTime}] ${text}`;
+    li.textContent = `[${formattedTime}, ${inputType}]: ${text}`;
     transcriptHistory.appendChild(li);
   });
 }
@@ -43,9 +43,9 @@ recordBtn.addEventListener("click", async () => {
     })
     .then(res => res.json())
     .then(data => {
-        const transcript = data.transcript || "Transcription failed.";
+        const transcript = data.transcript || "Transcription failed: " + data.error;
         transcriptDisplay.textContent = transcript;
-        addTranscriptToHistory(transcript); // <-- Add this line
+        addTranscriptToHistory(transcript, "Recording"); // <-- Add this line
     });
 
     recordBtn.classList.remove("recording");
@@ -56,7 +56,7 @@ recordBtn.addEventListener("click", async () => {
     recordBtn.disabled = true;
     stopBtn.disabled = false;
     recordBtn.classList.add("recording"); // ← Add recording state
-    
+
 });
 
 stopBtn.addEventListener("click", () => {
@@ -85,7 +85,7 @@ document.getElementById("upload-form").addEventListener("submit", async (e) => {
     });
 
     const data = await response.json();
-    const transcript = data.transcript || "Transcription failed.";
+    const transcript = data.transcript || "Transcription failed: " + data.error;
     transcriptDisplay.textContent = transcript;
-    addTranscriptToHistory(transcript);
+    addTranscriptToHistory(transcript, "Upload");
     });

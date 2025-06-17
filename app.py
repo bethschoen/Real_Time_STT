@@ -49,18 +49,22 @@ def check_result_from_azure(speech_recognition_result):
         return jsonify({"transcript": speech_recognition_result.text}), 200
    
     elif speech_recognition_result.reason == speechsdk.ResultReason.NoMatch:
-        logger.info("No speech could be recognized: {}".format(speech_recognition_result.no_match_details))
-        return jsonify({"error": "Could not recognize speech"}), 400
+        e = "No speech could be recognized: {}.".format(speech_recognition_result.no_match_details)
+        logger.info(e)
+        return jsonify({"error": e}), 400
    
     elif speech_recognition_result.reason == speechsdk.ResultReason.Canceled:
         cancellation_details = speech_recognition_result.cancellation_details
-        logger.info("Speech Recognition canceled: {}".format(cancellation_details.reason))
+        e = "Speech Recognition canceled: {}.".format(cancellation_details.reason)
+        logger.info(e)
 
         if cancellation_details.reason == speechsdk.CancellationReason.Error:
-            logger.info("Error details: {}".format(cancellation_details.error_details))
-            logger.info("Did you set the speech resource key and endpoint values?")
+            extra_details = f" Error details: {cancellation_details.error_details}. Did you set the speech resource key and endpoint values?"
+            logger.info(extra_details)
+        else:
+            extra_details = ""
 
-        return jsonify({"error": "Could not recognize speech"}), 400
+        return jsonify({"error": e + extra_details}), 400
 
 
 @app.route("/transcribe", methods=["POST"])
