@@ -5,6 +5,8 @@ from datetime import datetime
 from dotenv import load_dotenv
 load_dotenv()
 import subprocess
+import pandas as pd
+from time import gmtime, strftime
 
 FFMPEG_PATH = r"ffmpeg.exe"
 
@@ -108,6 +110,26 @@ def transcribe():
     logger.info("Audio removed locally")
 
     return check_result_from_azure(speech_recognition_result)
+
+@app.route("/save-transcript", methods=["POST"])
+def save_transcript():
+    edited_text = request.form.get("edited_transcript")
+    if len(edited_text) == 0:
+        return jsonify({"error": f"No text provided when trying to save."}), 400
+
+    mode = request.form.get("mode")
+
+    try:
+        df = pd.read_csv("transcriptions.csv")
+        id = 1 if len(df) == 0 else df["id"].max() + 1        
+        timestamp = strftime("%Y-%m-%d %H:%M:%S", gmtime())
+        df.loc[len(df)] = [id, timestamp, mode, edited_text]
+        df.to_csv("transcriptions.csv", index=False)
+
+        return jsonify({"msg": "Successful!"}), 200
+    
+    except Exception as e:
+        return jsonify({"error": f"Something went wrong when saving transcription: {e}"}), 400
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)

@@ -5,6 +5,7 @@
     <title>Audio Transcription</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
+<div style="margin-top: 20px;"></div>
 <body>
   <h1 style="text-align: center;">Audio Transcription</h1>
   <div class="container">
@@ -23,11 +24,27 @@
     </div>
   </div>
 
-  <!-- 📌 Transcript Section now inside a nicely padded container -->
+  <div id="loading-spinner" style="display: none;">
+    <p style="text-align: center;">Transcribing...</p>
+    <div class="spinner"></div>
+  </div>
+
   <div class="transcriptions">
     <h2>Transcript</h2>
-    <p id="transcript"></p>
+    <form id="transcript-edit" enctype="multipart/form-data">
+      <label for="edited_transcript">Edit before saving</label><br><br>
+      <textarea name="edited_transcript"></textarea><br>
+      <button type="submit">Save</button>
+    </form>
+    <p id="save-status" style="display: none; color: green; font-weight: bold;">
+      Saved!
+    </p>
+    <p id="save-error" style="display: none; color: red; font-weight: bold;">
+      Failed to save. Please try again.
+    </p>
+  </div>
 
+  <div class="transcriptions">
     <h3>Previous Transcripts</h3>
     <ul id="transcript-history"></ul>
   </div>
