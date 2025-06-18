@@ -160,3 +160,16 @@ textarea {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+
+.sidebar {
+  padding: 20px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  position: fixed;
+  top: 0;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.dropdown {
+    font-family: 'Montserrat', sans-serif;
+}
