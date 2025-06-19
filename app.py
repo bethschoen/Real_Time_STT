@@ -7,6 +7,7 @@ load_dotenv()
 import subprocess
 import pandas as pd
 from time import gmtime, strftime
+import time
 
 FFMPEG_PATH = r"ffmpeg.exe"
 
@@ -67,11 +68,80 @@ def check_result_from_azure(speech_recognition_result):
             extra_details = ""
 
         return jsonify({"error": e + extra_details}), 400
+    
+def single_shot_transcription(audio_path: str, language:str="en-GB"):
+    """
+    Transcription of audio less than 15 seconds
+    """
+    speech_key = os.getenv("SPEECH_KEY")
+    service_region = "uksouth"
+
+    speech_config = speechsdk.SpeechConfig(subscription=speech_key, region=service_region)
+    audio_config = speechsdk.audio.AudioConfig(filename=audio_path)
+
+    speech_recognizer = speechsdk.SpeechRecognizer(speech_config=speech_config, audio_config=audio_config)  
+    
+    speech_config.speech_recognition_language=language
+    logger.info(f"Connection to Azure Speech Services setup using language {language}")
+
+    speech_recognition_result = speech_recognizer.recognize_once_async().get()
+    logger.info("Transcription request made")
+
+    # delete resources so that we can delete audio files later
+    del speech_recognizer
+    audio_config = None
+
+    return check_result_from_azure(speech_recognition_result)
+
+    
+def speech_recognize_continuous_from_file(filename: str, language:str="en-GB"):
+    """
+    performs continuous speech recognition with input from an audio file
+    TODO: error handling
+    """
+    speech_config = speechsdk.SpeechConfig(subscription=os.getenv("SPEECH_KEY"), endpoint="https://uksouth.api.cognitive.microsoft.com")
+    speech_config.speech_recognition_language=language 
+    audio_config = speechsdk.audio.AudioConfig(filename=filename)
+    speech_recognizer = speechsdk.SpeechRecognizer(speech_config=speech_config, audio_config=audio_config)
+
+    done = False
+
+    def stop_cb(evt: speechsdk.SessionEventArgs):
+        """callback that signals to stop continuous recognition upon receiving an event `evt`"""
+        logger.info("CLOSING on {}".format(evt))
+        nonlocal done
+        done = True
+
+    final_transcription = []
+
+    def text_recognized(evt):
+        final_transcription.append(evt.result.text)
+
+    # collect recognized text
+    speech_recognizer.recognized.connect(text_recognized)
+
+    # Connect callbacks to the events fired by the speech recognizer
+    speech_recognizer.session_started.connect(lambda evt: logger.info("SESSION STARTED: {}".format(evt)))
+    speech_recognizer.session_stopped.connect(lambda evt: logger.info("SESSION STOPPED {}".format(evt)))
+    speech_recognizer.canceled.connect(lambda evt: logger.info("CANCELED {}".format(evt)))
+    # Stop continuous recognition on either session stopped or canceled events
+    speech_recognizer.session_stopped.connect(stop_cb)
+    speech_recognizer.canceled.connect(stop_cb)
+
+    # Start continuous speech recognition
+    speech_recognizer.start_continuous_recognition()
+    while not done:
+        time.sleep(0.5)
+
+    speech_recognizer.stop_continuous_recognition()    
+
+    return " ".join(final_transcription)
 
 
 @app.route("/transcribe", methods=["POST"])
 def transcribe():
     logger.info("Start transcribe route...")
+    # access uploaded audio and save locally
     file = request.files["audio"]
     input_path = "audio/input.wav"
     file.save(input_path)
@@ -89,27 +159,23 @@ def transcribe():
         audio_path = input_path
 
     # Transcribe with Azure
-    speech_key = os.getenv("SPEECH_KEY")
-    service_region = "uksouth"
-
-    speech_config = speechsdk.SpeechConfig(subscription=speech_key, region=service_region)
-    audio_config = speechsdk.audio.AudioConfig(filename=audio_path)
-
-    speech_recognizer = speechsdk.SpeechRecognizer(speech_config=speech_config, audio_config=audio_config)  
-    logger.info("Connection to Azure Speech Services setup")
-
-    speech_recognition_result = speech_recognizer.recognize_once_async().get()
-    logger.info("Transcription request made")
-
-    # delete local audio files
-    del speech_recognizer
-    audio_config = None
+    language = request.form.get("language_setting")
+    # recognized_speech = single_shot_transcription(audio_path, language)
+    before = time.time()
+    recognized_speech = speech_recognize_continuous_from_file(audio_path, language)
+    after = time.time()
+    logger.info(f"Audio transcribed, Time elapsed: {after-before}s")
+    
+    # Remove audio locally
     os.remove(input_path)
     if needs_conversion:
         os.remove(audio_path)
     logger.info("Audio removed locally")
 
-    return check_result_from_azure(speech_recognition_result)
+    if len(recognized_speech) < 5:
+        return jsonify({"error": "No information returned from Azure Speech Services. Something went wrong..."}), 400
+
+    return jsonify({"transcript": recognized_speech}), 200
 
 @app.route("/save-transcript", methods=["POST"])
 def save_transcript():
@@ -118,12 +184,13 @@ def save_transcript():
         return jsonify({"error": f"No text provided when trying to save."}), 400
 
     mode = request.form.get("mode")
+    language = request.form.get("language")
 
     try:
         df = pd.read_csv("transcriptions.csv")
         id = 1 if len(df) == 0 else df["id"].max() + 1        
         timestamp = strftime("%Y-%m-%d %H:%M:%S", gmtime())
-        df.loc[len(df)] = [id, timestamp, mode, edited_text]
+        df.loc[len(df)] = [id, timestamp, mode, language, edited_text]
         df.to_csv("transcriptions.csv", index=False)
 
         return jsonify({"msg": "Successful!"}), 200

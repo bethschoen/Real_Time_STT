@@ -39,6 +39,10 @@ recordBtn.addEventListener("click", async () => {
         const blob = new Blob(audioChunks, { type: "audio/webm" }); // original format from MediaRecorder
         const formData = new FormData();
         formData.append("audio", blob, "recording.webm"); // use webm extension
+        // add language
+        const selectedLanguage = document.getElementById("language-setting");
+        const languageString = selectedLanguage.value;
+        formData.append("language_setting", languageString);
 
         fetch("/transcribe", {
             method: "POST",
@@ -89,6 +93,11 @@ document.getElementById("upload-form").addEventListener("submit", async (e) => {
         }
     }
 
+    // add language
+    const selectedLanguage = document.getElementById("language-setting");
+    const languageString = selectedLanguage.value;
+    formData.append("language_setting", languageString);
+
     const response = await fetch("/transcribe", {
         method: "POST",
         body: formData
@@ -113,6 +122,7 @@ document.getElementById("transcript-edit").addEventListener("submit", async (e) 
     e.preventDefault();
     const formData = new FormData(e.target);
     formData.append("mode", transcriptMode);
+    formData.append("language", document.getElementById("language-setting").value);
 
     const response = await fetch("/save-transcript", {
     method: "POST",

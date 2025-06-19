@@ -1,6 +1,9 @@
-id,date,mode,transcription
-1,2025-06-17 16:24:16,Upload,"The human sacrificed himself to save the Pokémon. I pitted them against each other, but not until they set aside their differences did I see the true power they all shared deep inside. WoW!"
-2,2025-06-18 07:16:01,Recording,"Hello, can you hear me? Is this recording? I really hope this is working right now."
-3,2025-06-18 07:38:23,Recording,"During our latest appointment, the patients displayed no signs of pain."
-4,2025-06-18 07:56:09,Recording,I've been doing all this work while listening to David Bowie and it's been a lot of fun.
-5,2025-06-18 08:12:45,Recording,"What should happen now is that when I click stop and transcribe, what I'm saying should appear in the transcript box."
+id,date,mode,language,transcription
+1,2025-06-17 16:24:16,Upload,en-GB,"The human sacrificed himself to save the Pokémon. I pitted them against each other, but not until they set aside their differences did I see the true power they all shared deep inside. WoW!"
+2,2025-06-18 07:16:01,Recording,en-GB,"Hello, can you hear me? Is this recording? I really hope this is working right now."
+3,2025-06-18 07:38:23,Recording,en-GB,"During our latest appointment, the patients displayed no signs of pain."
+4,2025-06-18 07:56:09,Recording,en-GB,I've been doing all this work while listening to David Bowie and it's been a lot of fun.
+5,2025-06-18 08:12:45,Recording,en-GB,"What should happen now is that when I click stop and transcribe, what I'm saying should appear in the transcript box."
+6,2025-06-19 16:06:00,Upload,en-GB,"According to all known laws of aviation, there is no way a bee should be able to fly. Its wings are too small to get its fat little body off the ground. The bee, of course, flies anyway. Because bees don't care what humans think is impossible. Yellow. Black. Yellow. Black. Yellow, Black. Yellow, Black. Oh, black and yellow. Let's shake it up a little. Barry. Breakfast is ready. Coming. Hang on a second. Hello, Barry. Adam, Can you believe this is happening? I can't. I'll pick you up. Looking sharp. As your father pay good money for those. Sorry, I'm excited. Here's their graduate. We're very proud of you, son. A perfect report card. All bees. Very proud of thing going here. You got a lint on your fuzz. Oh, that's me. Wave to us. Will be in row 118,000. Bye, Barry. I told you, stop flying in the house. Hey, Adam. Hey, Barry. Is that fuzz? Joe? A little special day graduation."
+7,2025-06-19 16:12:42,Recording,de-DE,"Indische Studenten können nicht schwimmen, aber mit meinem Spaten im Garten kann ich Gräben buddeln. Ich liebe meine Frau am meisten. Dankeschön, du bist noch nicht fertig, ich bin noch nicht fertig, ich muss noch mehr reden okay heute war ein guter Tag, die Sonne war sehr heiß, es waren 26 Grad, aber bestimmt noch mehr und. Ich hab geschwitzt und ich will dann jetzt Abendessen. Und Duschen darf ich das okay?"
+8,2025-06-19 16:21:48,Recording,de-DE,"Hallo, ich hoffe, dass du mich hören kannst. Ich heiße Beth und ich habe dieses Programm entwickelt."
