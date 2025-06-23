@@ -21,6 +21,20 @@ function addTranscriptToHistory(text, inputType) {
   });
 }
 
+function getLanguageSetting() {
+    const selectedLanguage = document.getElementById("language-setting");
+    const languageString = selectedLanguage.value;
+
+    return languageString
+}
+
+function getDiarizationSetting() {
+    const diarization = document.getElementById("diarization");
+    const diarizedSelected = diarization.checked;
+
+    return diarizedSelected
+}
+
 let mediaRecorder;
 let audioChunks = [];
 
@@ -40,9 +54,11 @@ recordBtn.addEventListener("click", async () => {
         const formData = new FormData();
         formData.append("audio", blob, "recording.webm"); // use webm extension
         // add language
-        const selectedLanguage = document.getElementById("language-setting");
-        const languageString = selectedLanguage.value;
+        languageString = getLanguageSetting();
         formData.append("language_setting", languageString);
+        // add diarization option
+        diarizedSelected = getDiarizationSetting();
+        formData.append("diarization", diarizedSelected);
 
         fetch("/transcribe", {
             method: "POST",
@@ -92,11 +108,12 @@ document.getElementById("upload-form").addEventListener("submit", async (e) => {
             console.log(`${key}: ${value}`);
         }
     }
-
     // add language
-    const selectedLanguage = document.getElementById("language-setting");
-    const languageString = selectedLanguage.value;
+    languageString = getLanguageSetting();
     formData.append("language_setting", languageString);
+    // add diarization option
+    diarizedSelected = getDiarizationSetting();
+    formData.append("diarization", diarizedSelected); 
 
     const response = await fetch("/transcribe", {
         method: "POST",
@@ -106,6 +123,7 @@ document.getElementById("upload-form").addEventListener("submit", async (e) => {
     const data = await response.json();
     // now that we have a response, stop spinner
     document.getElementById("loading-spinner").style.display = "none";
+    document.getElementById("summary-description").style.display = "none";
     const transcript = data.transcript || "Transcription failed: " + data.error;
 
     // ✅ Set value inside the textarea
@@ -117,38 +135,66 @@ document.getElementById("upload-form").addEventListener("submit", async (e) => {
     addTranscriptToHistory(transcript, transcriptMode);
 });
 
+let clickedButton = null;
+document.querySelectorAll("#transcript-edit button").forEach((btn) => {
+    btn.addEventListener("click", function (e) {
+        clickedButton = e.target;
+    });
+});
+
 // Handle form for editing transcription
 document.getElementById("transcript-edit").addEventListener("submit", async (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
-    formData.append("mode", transcriptMode);
-    formData.append("language", document.getElementById("language-setting").value);
+    const action = clickedButton?.value;
 
-    const response = await fetch("/save-transcript", {
-    method: "POST",
-    body: formData
-    });
+    if (action === "save") {
+        formData.append("mode", transcriptMode);
+        formData.append("language", document.getElementById("language-setting").value);
+        formData.append("diarization", document.getElementById("diarization").checked);
 
-    const data = await response.json();
-    if (response.ok) {
-        // make sure there's no error message
-        document.getElementById("save-error").style.display = "none"
-        // Show the "Saved!" message
-        const saveStatus = document.getElementById("save-status");
-        saveStatus.style.display = "block";
+        const response = await fetch("/save-transcript", {
+        method: "POST",
+        body: formData
+        });
 
-        // fade it out after 2 seconds
-        setTimeout(() => {
-            saveStatus.style.display = "none";
-        }, 2000);
+        const data = await response.json();
+        if (response.ok) {
+            // make sure there's no error message
+            document.getElementById("save-error").style.display = "none"
+            // Show the "Saved!" message
+            const saveStatus = document.getElementById("save-status");
+            saveStatus.style.display = "block";
 
-        // reset
-        document.getElementById("transcript-edit").reset()
-        transcriptMode = ""
-    } else {
-        // Show the save error message
-        document.getElementById("save-error").textContent = data.error || "Something went wrong."
-        const saveStatus = document.getElementById("save-error");
-        saveStatus.style.display = "block";
+            // fade it out after 2 seconds
+            setTimeout(() => {
+                saveStatus.style.display = "none";
+            }, 2000);
+
+            // reset TODO: create a reset button
+            //document.getElementById("transcript-edit").reset()
+            //transcriptMode = ""
+        } else {
+            // Show the save error message
+            document.getElementById("save-error").textContent = data.error || "Something went wrong."
+            const saveStatus = document.getElementById("save-error");
+            saveStatus.style.display = "block";
+        }
+    } else if (action === "summarise") {
+        // start spinner
+        document.getElementById("loading-spinner-summarise").style.display = "block";
+
+        const response = await fetch("/summarise", {
+            method: "POST",
+            body: formData
+        });
+
+        const data = await response.json();
+        // now that we have a response, stop spinner
+        document.getElementById("loading-spinner-summarise").style.display = "none";
+        const summary = data.summary || "Summarisation failed: " + data.error;
+        // Set value inside the paragraph
+        document.getElementById("summary-result").style.display = "block";
+        document.getElementById("summary-result").textContent = summary;
     }
 });

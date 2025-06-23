@@ -10,7 +10,7 @@
 <body>
 
   <!-- side bar -->
-  <div class="sidebar" style="width:20%">
+  <div class="sidebar" style="width:15%">
     <div class="dropdown">
       <label for="language_setting"><strong>Select language</strong></label><br><br>
       <select name="language_setting" id="language-setting">
@@ -22,15 +22,23 @@
         <option value="it-IT">Italian (Italy)</option>
         <option value="es-ES">Spanish (Spain)</option>
       </select>
+    </div><br><br>
+    <!-- Rounded switch -->
+    <div class="toggle-container">
+      <strong>Diarize Conversation</strong><br><br>
+      <label class="toggle">
+        <input type="checkbox" id="diarization" name="diarization" />
+        <span class="slider"></span>
+      </label>
     </div>
   </div>
 
   <!-- main page content -->
-  <div style="margin-left:20%">
+  <div style="margin-left:15%">
 
     <h1 style="text-align: center;">Audio Transcription</h1>
     <div class="container">
-        <div class="half-width left-box">
+        <div class="box left-box">
         <h2>Upload Audio</h2>
         <form id="upload-form" enctype="multipart/form-data">
             <input type="file" name="audio" accept="audio/*" required />
@@ -38,7 +46,7 @@
         </form>
         </div>
 
-        <div class="half-width right-box">
+        <div class="box right-box">
         <h2>Record Audio</h2>
         <button id="record-btn">Start Recording</button>
         <button id="stop-btn" disabled>Stop & Transcribe</button>
@@ -48,21 +56,40 @@
     <div id="loading-spinner" style="display: none;">
         <p style="text-align: center;">Transcribing...</p>
         <div class="spinner"></div>
-    </div>
+    </div><br><br>
 
-    <div class="transcriptions">
-        <h2>Transcript</h2>
-        <form id="transcript-edit" enctype="multipart/form-data">
-        <label for="edited_transcript">Edit before saving</label><br><br>
-        <textarea name="edited_transcript"></textarea><br>
-        <button type="submit">Save</button>
-        </form>
-        <p id="save-status" style="display: none; color: green; font-weight: bold;">
-        Saved!
-        </p>
-        <p id="save-error" style="display: none; color: red; font-weight: bold;">
-        Failed to save. Please try again.
-        </p>
+    <div class="results-container">
+      <div class="transcriptions box left-box">
+          <h2>Transcript</h2>
+          <form id="transcript-edit" enctype="multipart/form-data">
+            <label for="edited_transcript">Edit before saving</label><br><br>
+            <textarea name="edited_transcript"></textarea><br>       
+            <div class="buttons">
+              <!-- save -->
+              <button type="submit" name="action" value="save">Save</button>            
+              <!-- summarise -->
+              <button type="submit" name="action" value="summarise">Summarise</button>
+            </div>     
+          </form>
+          <p id="save-status" style="display: none; color: green; font-weight: bold;">
+          Saved!
+          </p>
+          <p id="save-error" style="display: none; color: red; font-weight: bold;">
+          Failed to save. Please try again.
+          </p>
+      </div>
+      <div class="summarise box right-box">
+        <!-- title -->
+        <h2>Summary</h2>
+        <p id="summary-description" style="display: block;"><strong>Use AI to summarise the transcription.</strong><br><br>Press the "Summarise" button below.</p>
+        <!-- spinner -->
+        <div id="loading-spinner-summarise" style="display: none;">
+          <p style="text-align: center;">Summarising...</p>
+          <div class="spinner"></div>
+        </div><br><br>
+        <!-- summary -->
+        <p id="summary-result" name=summary_result style="display: none;"></p>
+      </div>      
     </div>
 
     <div class="transcriptions">

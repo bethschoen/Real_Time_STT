@@ -8,7 +8,9 @@ import subprocess
 import pandas as pd
 from time import gmtime, strftime
 import time
+from openai import AzureOpenAI
 
+import variables as vr
 FFMPEG_PATH = r"ffmpeg.exe"
 
 app = Flask(__name__)
@@ -73,10 +75,9 @@ def single_shot_transcription(audio_path: str, language:str="en-GB"):
     """
     Transcription of audio less than 15 seconds
     """
-    speech_key = os.getenv("SPEECH_KEY")
-    service_region = "uksouth"
+    speech_key = os.getenv("SPEECH_KEY")    
 
-    speech_config = speechsdk.SpeechConfig(subscription=speech_key, region=service_region)
+    speech_config = speechsdk.SpeechConfig(subscription=speech_key, region=vr.service_region)
     audio_config = speechsdk.audio.AudioConfig(filename=audio_path)
 
     speech_recognizer = speechsdk.SpeechRecognizer(speech_config=speech_config, audio_config=audio_config)  
@@ -94,12 +95,12 @@ def single_shot_transcription(audio_path: str, language:str="en-GB"):
     return check_result_from_azure(speech_recognition_result)
 
     
-def speech_recognize_continuous_from_file(filename: str, language:str="en-GB"):
+def speech_transcription_continuous(filename: str, language:str="en-GB"):
     """
     performs continuous speech recognition with input from an audio file
     TODO: error handling
     """
-    speech_config = speechsdk.SpeechConfig(subscription=os.getenv("SPEECH_KEY"), endpoint="https://uksouth.api.cognitive.microsoft.com")
+    speech_config = speechsdk.SpeechConfig(subscription=os.getenv("SPEECH_KEY"), endpoint=vr.endpoint)
     speech_config.speech_recognition_language=language 
     audio_config = speechsdk.audio.AudioConfig(filename=filename)
     speech_recognizer = speechsdk.SpeechRecognizer(speech_config=speech_config, audio_config=audio_config)
@@ -137,37 +138,96 @@ def speech_recognize_continuous_from_file(filename: str, language:str="en-GB"):
 
     return " ".join(final_transcription)
 
+def speech_transcription_with_diarization(filename: str, language: str="en-GB"):
+    speech_config = speechsdk.SpeechConfig(subscription=os.getenv('SPEECH_KEY'), endpoint=vr.endpoint)
+    speech_config.speech_recognition_language=language
+    speech_config.set_property(property_id=speechsdk.PropertyId.SpeechServiceResponse_DiarizeIntermediateResults, value='true')
+
+    audio_config = speechsdk.audio.AudioConfig(filename=filename)
+    conversation_transcriber = speechsdk.transcription.ConversationTranscriber(speech_config=speech_config, audio_config=audio_config)
+
+    transcribing_stop = False
+
+    def conversation_transcriber_session_started_cb(evt: speechsdk.SessionEventArgs):
+        logger.info('SessionStarted event')
+
+    def conversation_transcriber_session_stopped_cb(evt: speechsdk.SessionEventArgs):
+        logger.info('SessionStopped event')
+        
+    def conversation_transcriber_recognition_canceled_cb(evt: speechsdk.SessionEventArgs):
+        logger.info('Canceled event')
+
+    final_transcription = []
+
+    def conversation_transcriber_transcribed_cb(evt: speechsdk.SpeechRecognitionEventArgs):
+        if evt.result.reason == speechsdk.ResultReason.RecognizedSpeech:
+            final_transcription.append(f"{evt.result.speaker_id.replace("Guest", "Speaker")}: {evt.result.text}")
+        elif evt.result.reason == speechsdk.ResultReason.NoMatch:
+            logger.info('\tNOMATCH: Speech could not be TRANSCRIBED: {}'.format(evt.result.no_match_details))
+
+    def stop_cb(evt: speechsdk.SessionEventArgs):
+        #"""callback that signals to stop continuous recognition upon receiving an event `evt`"""
+        logger.info('CLOSING on {}'.format(evt))
+        nonlocal transcribing_stop
+        transcribing_stop = True
+
+    # Connect callbacks to the events fired by the conversation transcriber
+    conversation_transcriber.transcribed.connect(conversation_transcriber_transcribed_cb)
+    conversation_transcriber.session_started.connect(conversation_transcriber_session_started_cb)
+    conversation_transcriber.session_stopped.connect(conversation_transcriber_session_stopped_cb)
+    conversation_transcriber.canceled.connect(conversation_transcriber_recognition_canceled_cb)
+    # stop transcribing on either session stopped or canceled events
+    conversation_transcriber.session_stopped.connect(stop_cb)
+    conversation_transcriber.canceled.connect(stop_cb)
+
+    conversation_transcriber.start_transcribing_async()
+
+    # Waits for completion.
+    while not transcribing_stop:
+        time.sleep(.5)
+
+    conversation_transcriber.stop_transcribing_async()
+
+    return "\n".join(final_transcription)
+
 
 @app.route("/transcribe", methods=["POST"])
 def transcribe():
     logger.info("Start transcribe route...")
     # access uploaded audio and save locally
     file = request.files["audio"]
-    input_path = "audio/input.wav"
-    file.save(input_path)
+    
+    file.save(vr.input_path)
     logger.info("Audio stored locally")  
 
     # Check if conversion is needed
     original_filename = file.filename.lower()      
     needs_conversion = not original_filename.endswith(".wav")
     if needs_conversion:
-        converted_path = "audio/converted.wav"
-        convert_audio_to_wav(input_path, converted_path)
-        audio_path = converted_path
+        
+        convert_audio_to_wav(vr.input_path, vr.converted_path)
+        audio_path = vr.converted_path
     else:
         logger.info("Uploaded file is already a WAV file. No conversion needed.")
-        audio_path = input_path
+        audio_path = vr.input_path
 
     # Transcribe with Azure
     language = request.form.get("language_setting")
+    diarization = request.form.get("diarization") == 'true'
+    logger.info(f"Diarization: {diarization}")
     # recognized_speech = single_shot_transcription(audio_path, language)
-    before = time.time()
-    recognized_speech = speech_recognize_continuous_from_file(audio_path, language)
-    after = time.time()
+    if diarization:
+        before = time.time()
+        recognized_speech = speech_transcription_with_diarization(audio_path, language)
+        after = time.time()
+    else:
+        before = time.time()
+        recognized_speech = speech_transcription_continuous(audio_path, language)
+        after = time.time()
     logger.info(f"Audio transcribed, Time elapsed: {after-before}s")
     
     # Remove audio locally
-    os.remove(input_path)
+    os.remove(vr.input_path)
     if needs_conversion:
         os.remove(audio_path)
     logger.info("Audio removed locally")
@@ -177,6 +237,44 @@ def transcribe():
 
     return jsonify({"transcript": recognized_speech}), 200
 
+@app.route("/summarise", methods=["POST"])
+def summarise():
+
+    transcript = request.form.get("edited_transcript")
+    
+    try:
+        client_4o = AzureOpenAI(
+            api_key=os.getenv("AZURE_OPENAI_KEY_4O"),
+            api_version="2025-01-01-preview",
+            azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT_4O")
+        )
+        logger.info("Connected to 4o-mini model")
+    except Exception as e:
+        error = "Unable to connect to client: " + e
+        return jsonify({"error": error}), 400
+
+    try:
+        response = client_4o.chat.completions.create(
+            model="o4-mini",
+            messages=[
+                {
+                    "role":"system",
+                    "content":vr.summarise_prompt
+                },
+                {
+                    "role":"user",
+                    "content":"TRANSCRIPT: "+transcript
+                }
+            ]
+        )
+        logger.info("Summary generated")
+
+        return jsonify({"summary": response.choices[0].message.content}), 200
+    
+    except Exception as e:
+        error = "Unable to generate summary: " + e
+        return jsonify({"error": error}), 400
+
 @app.route("/save-transcript", methods=["POST"])
 def save_transcript():
     edited_text = request.form.get("edited_transcript")
@@ -185,13 +283,14 @@ def save_transcript():
 
     mode = request.form.get("mode")
     language = request.form.get("language")
+    diarization = request.form.get("diarization")
 
     try:
-        df = pd.read_csv("transcriptions.csv")
+        df = pd.read_csv(vr.transcriptions_data_path)
         id = 1 if len(df) == 0 else df["id"].max() + 1        
         timestamp = strftime("%Y-%m-%d %H:%M:%S", gmtime())
-        df.loc[len(df)] = [id, timestamp, mode, language, edited_text]
-        df.to_csv("transcriptions.csv", index=False)
+        df.loc[len(df)] = [id, timestamp, mode, language, diarization, edited_text]
+        df.to_csv(vr.transcriptions_data_path, index=False)
 
         return jsonify({"msg": "Successful!"}), 200
     

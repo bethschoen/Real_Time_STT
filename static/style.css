@@ -69,6 +69,68 @@ body {
     text-decoration: none;
 }
 
+.sidebar {
+  padding: 20px;
+  background-color: #f3f3f3;
+  border-radius: 8px;
+  position: fixed;
+  top: 0;
+  font-family: 'Montserrat', sans-serif;
+  height: 100%;
+}
+
+.dropdown {
+  padding: 20px;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.toggle-container {
+  margin-left: 20px;
+}
+
+.toggle {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+.toggle input {
+  display: none;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #bfccd4;
+  transition: 0.4s;
+  border-radius: 34px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: #FFF;
+  transition: 0.4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: #0079c8;
+}
+
+input:checked + .slider:before {
+  transform: translateX(26px);
+}
+
 /* Button styling */
 button {
     background-color: #0079c8;
@@ -106,28 +168,25 @@ button.recording::after {
     100% { opacity: 1; }
 }
 
-.container {
+/*.container {
   display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 20px;
+}*/
+
+.container {
+  display: grid;
+  grid-template-columns: 50% 50%;
   justify-content: space-between;
   gap: 20px;
   padding: 20px;
 }
 
-.half-width {
-  flex: 1;
+.box {
   background-color: #f9f9f9;
   padding: 20px;
   border-radius: 8px;
-}
-
-.transcriptions {
-  padding: 20px;
-  background-color: #ffffff;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  max-width: 800px;
-  margin: 20px auto;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .left-box {
@@ -138,12 +197,6 @@ button.recording::after {
 .right-box {
   margin-left: 10px;
   margin-right: 150px;
-}
-
-textarea {
-  width: 600px;
-  height: 150px;
-  font-family: 'Montserrat', sans-serif;
 }
 
 .spinner {
@@ -161,15 +214,28 @@ textarea {
   100% { transform: rotate(360deg); }
 }
 
-.sidebar {
-  padding: 20px;
-  background-color: #ffffff;
+.results-container {
+  display: grid;
+  grid-template-columns: 60% 40%;
+  justify-content: space-between;
+  gap: 20px;
+  height: 500px;
+}
+
+.transcriptions {
   border-radius: 8px;
-  position: fixed;
-  top: 0;
+  object-fit: contain;
+}
+
+textarea {
+  width: 100%;
+  height: 300px;
+  box-sizing: border-box;
   font-family: 'Montserrat', sans-serif;
 }
 
-.dropdown {
-    font-family: 'Montserrat', sans-serif;
+.buttons {
+  display: grid;
+  grid-template-columns: 50% 50%;
+  justify-content: space-between;
 }

@@ -1,9 +1,29 @@
-id,date,mode,language,transcription
-1,2025-06-17 16:24:16,Upload,en-GB,"The human sacrificed himself to save the Pokémon. I pitted them against each other, but not until they set aside their differences did I see the true power they all shared deep inside. WoW!"
-2,2025-06-18 07:16:01,Recording,en-GB,"Hello, can you hear me? Is this recording? I really hope this is working right now."
-3,2025-06-18 07:38:23,Recording,en-GB,"During our latest appointment, the patients displayed no signs of pain."
-4,2025-06-18 07:56:09,Recording,en-GB,I've been doing all this work while listening to David Bowie and it's been a lot of fun.
-5,2025-06-18 08:12:45,Recording,en-GB,"What should happen now is that when I click stop and transcribe, what I'm saying should appear in the transcript box."
-6,2025-06-19 16:06:00,Upload,en-GB,"According to all known laws of aviation, there is no way a bee should be able to fly. Its wings are too small to get its fat little body off the ground. The bee, of course, flies anyway. Because bees don't care what humans think is impossible. Yellow. Black. Yellow. Black. Yellow, Black. Yellow, Black. Oh, black and yellow. Let's shake it up a little. Barry. Breakfast is ready. Coming. Hang on a second. Hello, Barry. Adam, Can you believe this is happening? I can't. I'll pick you up. Looking sharp. As your father pay good money for those. Sorry, I'm excited. Here's their graduate. We're very proud of you, son. A perfect report card. All bees. Very proud of thing going here. You got a lint on your fuzz. Oh, that's me. Wave to us. Will be in row 118,000. Bye, Barry. I told you, stop flying in the house. Hey, Adam. Hey, Barry. Is that fuzz? Joe? A little special day graduation."
-7,2025-06-19 16:12:42,Recording,de-DE,"Indische Studenten können nicht schwimmen, aber mit meinem Spaten im Garten kann ich Gräben buddeln. Ich liebe meine Frau am meisten. Dankeschön, du bist noch nicht fertig, ich bin noch nicht fertig, ich muss noch mehr reden okay heute war ein guter Tag, die Sonne war sehr heiß, es waren 26 Grad, aber bestimmt noch mehr und. Ich hab geschwitzt und ich will dann jetzt Abendessen. Und Duschen darf ich das okay?"
-8,2025-06-19 16:21:48,Recording,de-DE,"Hallo, ich hoffe, dass du mich hören kannst. Ich heiße Beth und ich habe dieses Programm entwickelt."
+id,date,mode,language,diarization,transcription
+1,2025-06-17 16:24:16,Upload,en-GB,False,"The human sacrificed himself to save the Pokémon. I pitted them against each other, but not until they set aside their differences did I see the true power they all shared deep inside. WoW!"
+2,2025-06-18 07:16:01,Recording,en-GB,False,"Hello, can you hear me? Is this recording? I really hope this is working right now."
+3,2025-06-18 07:38:23,Recording,en-GB,False,"During our latest appointment, the patients displayed no signs of pain."
+4,2025-06-18 07:56:09,Recording,en-GB,False,I've been doing all this work while listening to David Bowie and it's been a lot of fun.
+5,2025-06-18 08:12:45,Recording,en-GB,False,"What should happen now is that when I click stop and transcribe, what I'm saying should appear in the transcript box."
+6,2025-06-19 16:06:00,Upload,en-GB,False,"According to all known laws of aviation, there is no way a bee should be able to fly. Its wings are too small to get its fat little body off the ground. The bee, of course, flies anyway. Because bees don't care what humans think is impossible. Yellow. Black. Yellow. Black. Yellow, Black. Yellow, Black. Oh, black and yellow. Let's shake it up a little. Barry. Breakfast is ready. Coming. Hang on a second. Hello, Barry. Adam, Can you believe this is happening? I can't. I'll pick you up. Looking sharp. As your father pay good money for those. Sorry, I'm excited. Here's their graduate. We're very proud of you, son. A perfect report card. All bees. Very proud of thing going here. You got a lint on your fuzz. Oh, that's me. Wave to us. Will be in row 118,000. Bye, Barry. I told you, stop flying in the house. Hey, Adam. Hey, Barry. Is that fuzz? Joe? A little special day graduation."
+7,2025-06-19 16:12:42,Recording,de-DE,False,"Indische Studenten können nicht schwimmen, aber mit meinem Spaten im Garten kann ich Gräben buddeln. Ich liebe meine Frau am meisten. Dankeschön, du bist noch nicht fertig, ich bin noch nicht fertig, ich muss noch mehr reden okay heute war ein guter Tag, die Sonne war sehr heiß, es waren 26 Grad, aber bestimmt noch mehr und. Ich hab geschwitzt und ich will dann jetzt Abendessen. Und Duschen darf ich das okay?"
+8,2025-06-19 16:21:48,Recording,de-DE,False,"Hallo, ich hoffe, dass du mich hören kannst. Ich heiße Beth und ich habe dieses Programm entwickelt."
+9,2025-06-23 09:04:18,Upload,en-GB,True,"Guest-1: So, Chairman, will be it late, shall we get this meeting started? We'll.
+Guest-2: Start the meeting and I want to repeat what I said at the beginning of the last meeting. This meeting has not been called according to the law. The law has been broken.
+Guest-1: He has been properly.
+Guest-2: Will you please let the please. You have no authority here, Jackie Weaver. No authority at all.
+Guest-3: Don't don't just kicked him out.
+Guest-1: This is a meeting called by two councillors.
+Guest-1: Illegally, they now elect a chairman.
+Guest-3: The carpet for the vice chair. Vice chairs. Here. I take charge, read the standing orders, read them and understand them.
+Guest-2: Where's the chairman gone?
+Guest-1: I'd like to elect a chairman for this meeting.
+Guest-4: You don't have to elect a chairman. Does the chairman already installed the chairman of the council?
+Guest-1: Councillor Berkel, we've been through this. What?
+Unknown: Are you talking about? You don't know what you're talking about."
+10,2025-06-23 09:26:36,Upload,en-US,True,"Speaker-1: Now get out your pencils and paper and write down the assignment.
+Speaker-2: Did you hear that? We got an assignment. 
+Speaker-1: Everyone must write an essay on what not to do at a stoplight.
+Speaker-2: Did you hear that? What not to do at a stoplight!
+Speaker-1: In no less than 800 words.
+Speaker-3: Did you hear that? 800 words.
+Speaker-2: Yeah, I know."
