@@ -17,6 +17,7 @@ FFMPEG_PATH = r"ffmpeg.exe"
 
 app = Flask(__name__)
 
+# informal logger
 class Logger:
 
     def __init__(self, print:bool=True):

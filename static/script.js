@@ -4,6 +4,7 @@ const stopBtn = document.getElementById("stop-btn");
 let transcripts = [];  // Store all transcripts this session
 let transcriptMode = "";
 let uploadFilename = "";
+let editedTranscript = "";
 let generatedSummary = "";
 
 function addTranscriptToHistory(text, inputType) {
@@ -37,6 +38,18 @@ function getDiarizationSetting() {
     return diarizedSelected
 }
 
+function resetSummary() {
+    const summaryElem = document.getElementById("summary-result");
+    if (summaryElem) {
+        summaryElem.innerHTML = "";
+        summaryElem.style.display = "none";
+        generatedSummary = "";
+    }
+    document.getElementById("summary-description-title").style.display = "block";
+    document.getElementById("summary-description").style.display = "block";    
+    document.getElementById("summary-description").textContent = "Transcribe an audio file to summarise.";
+}
+
 let mediaRecorder;
 let audioChunks = [];
 
@@ -50,8 +63,11 @@ recordBtn.addEventListener("click", async () => {
     };
 
     mediaRecorder.onstop = () => {
+        // reset summary for new audio
+        resetSummary()
         // start spinner 
         document.getElementById("loading-spinner").style.display = "block";
+        uploadFilename = "";
         const blob = new Blob(audioChunks, { type: "audio/webm" }); // original format from MediaRecorder
         const formData = new FormData();
         formData.append("audio", blob, "recording.webm"); // use webm extension
@@ -99,12 +115,14 @@ stopBtn.addEventListener("click", () => {
 document.getElementById("upload-form").addEventListener("submit", async (e) => {
     // stop the program from simply sending the request to the API, edit the request first
     e.preventDefault();
+    // reset summary for new audio
+    resetSummary()
     // start spinner
     document.getElementById("loading-spinner").style.display = "block";
     const formData = new FormData(e.target);
     uploadFilename = formData.get("audio").name;
 
-    // Optional: log for debugging
+    // Check contents uploaded
     for (let [key, value] of formData.entries()) {
         if (value instanceof File) {
             console.log(`${key}: ${value.name}, ${value.size} bytes, ${value.type}`);
@@ -146,16 +164,60 @@ document.querySelectorAll("#transcript-edit button").forEach((btn) => {
     });
 });
 
-// Handle form for editing transcription
+// listen for email address submission
+document.getElementById("email-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const emailFormData = new FormData(e.target);
+    emailFormData.append("transcript", editedTranscript);
+    emailFormData.append("mode", transcriptMode);
+    emailFormData.append("filename", uploadFilename);
+    languageString = getLanguageSetting();
+    emailFormData.append("language", languageString);
+    diarizedSelected = getDiarizationSetting();
+    emailFormData.append("diarization", diarizedSelected);
+    emailFormData.append("summary", generatedSummary);
+
+    // Check contents being emailed
+    for (let [key, value] of emailFormData.entries()) {
+        console.log(`${key}: ${value}`);
+    }
+
+    const response = await fetch("/send-email", {
+    method: "POST",
+    body: emailFormData
+    });
+
+    const data = await response.json();
+    const emailResult = data.success || data.error;
+    const resultStatus = document.getElementById("email-sent-msg");
+    resultStatus.textContent = emailResult
+    resultStatus.style.display = "block";
+
+    let fadeOutTime = 0;
+    if (response.ok) {
+        // fade it out after 2 seconds
+        fadeOutTime = 2000;
+    } else {
+        // longer time to fade out
+        fadeOutTime = 10000;
+    }
+    setTimeout(() => {
+        resultStatus.style.display = "none";
+        document.getElementById("email-popup").style.display = "none";
+    }, fadeOutTime);
+})
+
+// Handle transcription actions
 document.getElementById("transcript-edit").addEventListener("submit", async (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
+    editedTranscript = formData.get("edited_transcript");
     const action = clickedButton?.value;
 
     if (action === "save") {
         formData.append("mode", transcriptMode);
-        formData.append("language", document.getElementById("language-setting").value);
-        formData.append("diarization", document.getElementById("diarization").checked);
+        formData.append("language", getLanguageSetting());
+        formData.append("diarization", getDiarizationSetting());
 
         const response = await fetch("/save-transcript", {
         method: "POST",
@@ -203,53 +265,9 @@ document.getElementById("transcript-edit").addEventListener("submit", async (e) 
         document.getElementById("summary-result").innerHTML = htmlSummary;
 
     } else if (action === "email") {
-        console.log("Got here")
         // change display of pop up to block
         document.getElementById("email-popup").style.display = "block";
-        // listen for email address submission
-        document.getElementById("email-form").addEventListener("submit", async (e) => {
-            e.preventDefault();
-            const emailFormData = new FormData(e.target);
-            emailFormData.append("transcript", formData.get("edited_transcript"));
-            emailFormData.append("mode", transcriptMode);
-            emailFormData.append("filename", uploadFilename);
-            emailFormData.append("language", document.getElementById("language-setting").value);
-            emailFormData.append("diarization", document.getElementById("diarization").checked);
-            emailFormData.append("summary", generatedSummary);
-
-            // Optional: log for debugging
-            for (let [key, value] of emailFormData.entries()) {
-                if (value instanceof File) {
-                    console.log(`${key}: ${value.name}, ${value.size} bytes, ${value.type}`);
-                } else {
-                    console.log(`${key}: ${value}`);
-                }
-            }
-
-            const response = await fetch("/send-email", {
-            method: "POST",
-            body: emailFormData
-            });
-
-            const data = await response.json();
-            const emailResult = data.success || data.error;
-            const resultStatus = document.getElementById("email-sent-msg");
-            resultStatus.textContent = emailResult
-            resultStatus.style.display = "block";
-
-            let fadeOutTime = 0;
-            if (response.ok) {
-                // fade it out after 2 seconds
-                fadeOutTime = 2000;
-            } else {
-                // longer time to fade out
-                fadeOutTime = 10000;
-            }
-            setTimeout(() => {
-                resultStatus.style.display = "none";
-                document.getElementById("email-popup").style.display = "none";
-            }, fadeOutTime);
-        })
+        // listener is defined above
     }
 });
 
@@ -276,15 +294,7 @@ document.getElementById("reset-page").addEventListener("click", () => {
     document.getElementById("loading-spinner-summarise").style.display = "none";
 
     // Clear summary
-    const summaryElem = document.getElementById("summary-result");
-    if (summaryElem) {
-        summaryElem.innerHTML = "";
-        summaryElem.style.display = "none";
-    }
-    document.getElementById("summary-description-title").style.display = "block";
-    document.getElementById("summary-description").style.display = "block";    
-    document.getElementById("summary-description").textContent = "Transcribe an audio file to summarise.";
-    
+    resetSummary()
 
     // Hide save/success messages
     document.getElementById("save-status").style.display = "none";
@@ -300,6 +310,7 @@ document.getElementById("reset-page").addEventListener("click", () => {
 
     // Reset any custom state variables
     transcriptMode = "";    
-    uploadFilename = "";    
+    uploadFilename = "";   
+    editedTranscript = ""; 
     generatedSummary = "";
 });
