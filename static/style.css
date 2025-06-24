@@ -233,8 +233,16 @@ textarea {
 
 .buttons {
   display: grid;
-  grid-template-columns: 50% 50%;
+  grid-template-columns: 33% 33% 33%;
   justify-content: space-between;
+}
+
+.email-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 30%;
 }
 
 .previous-transcripts {

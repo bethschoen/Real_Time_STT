@@ -9,6 +9,8 @@ import pandas as pd
 from time import gmtime, strftime
 import time
 from openai import AzureOpenAI
+import smtplib
+import ssl
 
 import variables as vr
 FFMPEG_PATH = r"ffmpeg.exe"
@@ -268,7 +270,7 @@ def summarise():
         )
         logger.info("Connected to 4o-mini model")
     except Exception as e:
-        error = "Unable to connect to client: " + e
+        error = "Unable to connect to client: " + str(e)
         return jsonify({"error": error}), 400
 
     try:
@@ -289,10 +291,10 @@ def summarise():
         logger.info(f"Summary generated")
         processed_summary = process_summary(summary)
 
-        return jsonify({"summary": processed_summary}), 200
+        return jsonify({"html_summary": processed_summary, "summary": summary}), 200
     
     except Exception as e:
-        error = "Unable to generate summary: " + e
+        error = "Unable to generate summary: " + str(e)
         return jsonify({"error": error}), 400
 
 @app.route("/save-transcript", methods=["POST"])
@@ -316,6 +318,67 @@ def save_transcript():
     
     except Exception as e:
         return jsonify({"error": f"Something went wrong when saving transcription: {e}"}), 400
+
+
+def populate_email_template(email_info: dict) -> str:    
+
+    def construct_email_part(template, info):
+
+        if info == "":
+            return ''
+        else:
+            return "\n" + template + info
+    
+    email_time = datetime.today().strftime('%Y-%m-%d %H:%M')
+    email_subject = vr.email_subject + email_time
+    email_datetime = vr.email_datetime + email_time
+    email_filename = construct_email_part(vr.email_filename, email_info["filename"])
+    email_mode = construct_email_part(vr.email_mode, email_info["mode"])
+    email_language = construct_email_part(vr.email_language, email_info["language"])
+    email_diarization = construct_email_part(vr.email_diarization, email_info["diarization"])
+    email_transcript = construct_email_part(vr.email_transcript, email_info["transcript"])
+    email_summary = construct_email_part(vr.email_summary, email_info["summary"])
+
+    email_body = email_subject + vr.email_header + email_datetime + email_filename + email_mode + email_language + email_diarization + email_transcript + email_summary + vr.email_close
+
+    return email_body
+    
+@app.route("/send-email", methods=["POST"])
+def send_email():
+
+    # get info
+    try:
+        needed_info = ["filename", "mode", "language", "diarization", "transcript", "summary", "user_email"]
+        email_info = {i:request.form.get(i) for i in needed_info}
+        email_message = populate_email_template(email_info)
+        receiver_email = email_info["user_email"].lower()
+        logger.info("Email generated")
+        logger.info(email_message)
+
+    except Exception as e:
+        error = "Something wrong with the provided information: " + str(e)
+        logger.info(error)
+        return jsonify({"error": error}), 400
+      
+    # send email  
+    try:
+        sender_email = os.getenv("GMAIL_ADDRESS")
+        port = 465  # For SSL
+        password = os.getenv("GMAIL_PASSWORD")
+
+        # Create a secure SSL context
+        context = ssl.create_default_context()
+
+        with smtplib.SMTP_SSL("smtp.gmail.com", port, context=context) as server:
+            server.login(sender_email, password)
+            server.sendmail(sender_email, receiver_email, email_message.encode('utf-8'))
+        logger.info("Email sent!")
+        return jsonify({"success": "Success!"}), 200
+
+    except Exception as e:
+        error = "Couldn't send email: " + str(e)
+        logger.info(error)
+        return jsonify({"error": error}), 400
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
