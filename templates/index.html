@@ -11,6 +11,9 @@
 
   <!-- side bar -->
   <div class="sidebar" style="width:15%">
+    <!-- reset button -->
+    <br><br><button id="reset-page" class="reset-button" type="button"><strong>Reset page</strong></button><br><br>
+    <!-- language select -->
     <div class="dropdown">
       <label for="language_setting"><strong>Select language</strong></label><br><br>
       <select name="language_setting" id="language-setting">
@@ -23,9 +26,9 @@
         <option value="es-ES">Spanish (Spain)</option>
       </select>
     </div><br><br>
-    <!-- Rounded switch -->
+    <!-- diarization switch -->
     <div class="toggle-container">
-      <strong>Diarize Conversation</strong><br><br>
+      <strong>Diarize conversation</strong><br><br>
       <label class="toggle">
         <input type="checkbox" id="diarization" name="diarization" />
         <span class="slider"></span>
@@ -38,24 +41,23 @@
 
     <h1 style="text-align: center;">Audio Transcription</h1>
     <div class="container">
-        <div class="box left-box">
+      <div class="box left-box">
         <h2>Upload Audio</h2>
         <form id="upload-form" enctype="multipart/form-data">
             <input type="file" name="audio" accept="audio/*" required />
             <button type="submit">Transcribe</button>
         </form>
-        </div>
-
-        <div class="box right-box">
+      </div>
+      <div class="box right-box">
         <h2>Record Audio</h2>
         <button id="record-btn">Start Recording</button>
         <button id="stop-btn" disabled>Stop & Transcribe</button>
-        </div>
+      </div>
     </div>
 
     <div id="loading-spinner" style="display: none;">
-        <p style="text-align: center;">Transcribing...</p>
-        <div class="spinner"></div>
+      <p style="text-align: center;">Transcribing...</p>
+      <div class="spinner"></div>
     </div><br><br>
 
     <div class="results-container">
@@ -81,7 +83,8 @@
       <div class="summarise box right-box">
         <!-- title -->
         <h2>Summary</h2>
-        <p id="summary-description" style="display: block;"><strong>Use AI to summarise the transcription.</strong><br><br>Press the "Summarise" button below.</p>
+        <p id="summary-description-title" style="display: block;"><strong>Use AI to summarise the transcription.</strong></p>
+        <p id="summary-description" style="display: block;">Transcribe an audio file to summarise.</p>
         <!-- spinner -->
         <div id="loading-spinner-summarise" style="display: none;">
           <p style="text-align: center;">Summarising...</p>
@@ -90,11 +93,11 @@
         <!-- summary -->
         <p id="summary-result" name=summary_result style="display: none;"></p>
       </div>      
-    </div>
+    </div><br><br>
 
-    <div class="transcriptions">
-        <h3>Previous Transcripts</h3>
-        <ul id="transcript-history"></ul>
+    <div class="box previous-transcripts">
+      <h3>Previous Transcripts</h3>
+      <ul id="transcript-history"></ul>
     </div>
   </div>
 

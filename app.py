@@ -237,6 +237,24 @@ def transcribe():
 
     return jsonify({"transcript": recognized_speech}), 200
 
+def process_summary(summary: str) -> str:
+
+    # check the LLM formatted the output as bullet points
+    if "•" not in summary:
+        return summary
+    
+    # get each bullet point
+    points = [i.strip() for i in summary.split("•") if len(i) > 2]#
+    # start html bullet points
+    combined_str = "<ul style='padding-left: 20px;'>"
+    # iterate through each point, creating bullet point in html
+    for item in points:
+        combined_str += f"<li style='margin-bottom:5px;'>{item}</li>"
+    # end html
+    combined_str += "</ul>"
+
+    return combined_str
+
 @app.route("/summarise", methods=["POST"])
 def summarise():
 
@@ -267,9 +285,11 @@ def summarise():
                 }
             ]
         )
-        logger.info("Summary generated")
+        summary = response.choices[0].message.content
+        logger.info(f"Summary generated")
+        processed_summary = process_summary(summary)
 
-        return jsonify({"summary": response.choices[0].message.content}), 200
+        return jsonify({"summary": processed_summary}), 200
     
     except Exception as e:
         error = "Unable to generate summary: " + e

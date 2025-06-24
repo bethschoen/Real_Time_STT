@@ -79,6 +79,10 @@ body {
   height: 100%;
 }
 
+.reset-button {
+  margin-left: 20px;
+}
+
 .dropdown {
   padding: 20px;
   font-family: 'Montserrat', sans-serif;
@@ -168,13 +172,6 @@ button.recording::after {
     100% { opacity: 1; }
 }
 
-/*.container {
-  display: flex;
-  justify-content: space-between;
-  gap: 20px;
-  padding: 20px;
-}*/
-
 .container {
   display: grid;
   grid-template-columns: 50% 50%;
@@ -237,5 +234,11 @@ textarea {
 .buttons {
   display: grid;
   grid-template-columns: 50% 50%;
+  justify-content: space-between;
+}
+
+.previous-transcripts {
+  margin-left: 150px;
+  margin-right: 150px;
   justify-content: space-between;
 }

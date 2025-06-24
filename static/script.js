@@ -1,7 +1,7 @@
 const recordBtn = document.getElementById("record-btn");
 const stopBtn = document.getElementById("stop-btn");
 
-const transcripts = [];  // Store all transcripts this session
+let transcripts = [];  // Store all transcripts this session
 let transcriptMode = "";
 
 function addTranscriptToHistory(text, inputType) {
@@ -67,7 +67,8 @@ recordBtn.addEventListener("click", async () => {
         .then(res => res.json())
         .then(data => {
             // stop spinner
-            document.getElementById("loading-spinner").style.display = "none";
+            document.getElementById("loading-spinner").style.display = "none";            
+            document.getElementById("summary-description").textContent = "Press the 'Summarise' button below.";
             const transcript = data.transcript || "Transcription failed: " + data.error;
             document.querySelector("textarea[name='edited_transcript']").value = transcript;
             transcriptMode = "Recording"
@@ -123,7 +124,7 @@ document.getElementById("upload-form").addEventListener("submit", async (e) => {
     const data = await response.json();
     // now that we have a response, stop spinner
     document.getElementById("loading-spinner").style.display = "none";
-    document.getElementById("summary-description").style.display = "none";
+    document.getElementById("summary-description").textContent = "Press the 'Summarise' button below.";
     const transcript = data.transcript || "Transcription failed: " + data.error;
 
     // ✅ Set value inside the textarea
@@ -181,6 +182,8 @@ document.getElementById("transcript-edit").addEventListener("submit", async (e) 
             saveStatus.style.display = "block";
         }
     } else if (action === "summarise") {
+        document.getElementById("summary-description-title").style.display = "none";
+        document.getElementById("summary-description").style.display = "none";
         // start spinner
         document.getElementById("loading-spinner-summarise").style.display = "block";
 
@@ -195,6 +198,53 @@ document.getElementById("transcript-edit").addEventListener("submit", async (e) 
         const summary = data.summary || "Summarisation failed: " + data.error;
         // Set value inside the paragraph
         document.getElementById("summary-result").style.display = "block";
-        document.getElementById("summary-result").textContent = summary;
+        document.getElementById("summary-result").innerHTML = summary;
     }
+});
+
+// Handle reset button
+document.getElementById("reset-page").addEventListener("click", () => {
+    // Clear the textarea
+    const textarea = document.querySelector("textarea[name='edited_transcript']");
+    if (textarea) textarea.value = "";
+
+    // Clear transcript history
+    transcripts = []; 
+    const transcriptHistory = document.getElementById("transcript-history");
+    if (transcriptHistory) transcriptHistory.innerHTML = "";
+
+    // Clear uploaded file input (if you have one)
+    const fileInput = document.querySelector("#upload-form input[type='file']");
+    if (fileInput) {
+        fileInput.value = "";
+    }
+
+    // Hide spinner
+    document.getElementById("loading-spinner-summarise").style.display = "none";
+
+    // Clear summary
+    const summaryElem = document.getElementById("summary-result");
+    if (summaryElem) {
+        summaryElem.innerHTML = "";
+        summaryElem.style.display = "none";
+    }
+    document.getElementById("summary-description-title").style.display = "block";
+    document.getElementById("summary-description").style.display = "block";    
+    document.getElementById("summary-description").textContent = "Transcribe an audio file to summarise.";
+    
+
+    // Hide save/success messages
+    document.getElementById("save-status").style.display = "none";
+    document.getElementById("save-error").style.display = "none";
+
+    // Reset language dropdown if needed
+    const languageSelect = document.getElementById("language-setting");
+    if (languageSelect) languageSelect.selectedIndex = 0;
+
+    // Reset diarization toggle if needed
+    const diarizationToggle = document.getElementById("diarization");
+    if (diarizationToggle) diarizationToggle.checked = false;
+
+    // Reset any custom state variables
+    transcriptMode = "";
 });
