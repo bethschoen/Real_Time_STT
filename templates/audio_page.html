@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Recordings</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<div style="margin-top: 20px;"></div>
+<body>
+    <h1>List</h1>
+    <table id="recording-list">
+        <tr>
+            <th>File</th>
+            <th>Delete</th>
+        </tr>
+    </table>    
+    <!-- download links for recordings-->
+    {% if recordings %}
+        <script>
+            const recordingTable = document.getElementById("recording-list");
+            const recordingsList = {{ recordings | tojson }};
+            recordingsList.forEach(item => {
+                const tr = document.createElement("tr");
+                const link = document.createElement("a");
+                link.href = `/static/recorded_audio/${item}`;
+                link.textContent = item;
+                link.download = item;
+                tr.appendChild(link);
+                recordingTable.appendChild(link);
+            });
+        </script>
+    {% endif %}
+
+    <!-- empty folder button -->
+    <br><br><button id="delete-recordings" class="reset-button" type="button"><strong>Delete Recordings</strong></button>
+  
+    <script src="{{ url_for('static', filename='audio_script.js') }}"></script>
+</body>
+</html>

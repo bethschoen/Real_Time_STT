@@ -1,10 +1,19 @@
+# scooter pictures
+scooter_pics = ["meow meow.png", "meow mew mew meow.png", "purr purr.png"]
+# path relative to static folder. Make sure to use "/"
+scooter_pics_dir = "cat_pics"
+
 # azure speech service info
 service_region = "uksouth"
 endpoint = "https://uksouth.api.cognitive.microsoft.com"
 
 # transcribe route
-input_path = "audio/input.wav"
-converted_path = "audio/converted.wav"
+temp_upload_dir = "audio/temp_upload"
+temp_filename = "input.wav"
+recorded_audio_dir = "static/recorded_audio"
+incoming_recording_filename = "incoming_recording.wav"
+recording_file_name = "recording_{}.wav"
+converted_filename = "converted.wav"
 
 # save transcript route
 transcriptions_data_path = "transcriptions.csv"
@@ -53,4 +62,4 @@ email_summary = "\nSummary:\n"
 
 email_close = """
 
-Made with 💖 by Beth"""
+Made with <3 by Beth"""

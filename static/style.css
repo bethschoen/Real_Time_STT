@@ -47,13 +47,6 @@ body {
     z-index: 1000;
 }
 
-.main-content {
-    flex: 1;
-    padding: 20px;
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
 .footer {
     background-color: #0d1846;
     color: white;
@@ -67,6 +60,22 @@ body {
 .footer a {
     color: white;
     text-decoration: none;
+}
+
+/*.main-content {
+  backdrop-filter: none;
+}*/
+
+.cat-placeholder {
+  display: block;
+  max-width: 30%; 
+  margin: 20px auto; /* auto horizontally centers it */
+}
+
+.cat-placeholder img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
 }
 
 .sidebar {
@@ -238,11 +247,22 @@ textarea {
 }
 
 .email-popup {
+  border-style: solid;
+  border-color: #0d1846;
+  border-width: thin;
+  border-radius: 8px;
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   width: 30%;
+}
+
+.email-close-button {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  height: 10px;
 }
 
 .previous-transcripts {

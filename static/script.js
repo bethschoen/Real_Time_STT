@@ -65,6 +65,8 @@ recordBtn.addEventListener("click", async () => {
     mediaRecorder.onstop = () => {
         // reset summary for new audio
         resetSummary()
+        // hide scooter
+        document.getElementById("scooter").style.display = "none";
         // start spinner 
         document.getElementById("loading-spinner").style.display = "block";
         uploadFilename = "";
@@ -76,7 +78,10 @@ recordBtn.addEventListener("click", async () => {
         formData.append("language_setting", languageString);
         // add diarization option
         diarizedSelected = getDiarizationSetting();
-        formData.append("diarization", diarizedSelected);
+        formData.append("diarization", diarizedSelected); 
+        // add mode
+        transcriptMode = "Recording"
+        formData.append("mode", transcriptMode); 
 
         fetch("/transcribe", {
             method: "POST",
@@ -85,12 +90,15 @@ recordBtn.addEventListener("click", async () => {
         .then(res => res.json())
         .then(data => {
             // stop spinner
-            document.getElementById("loading-spinner").style.display = "none";            
+            document.getElementById("loading-spinner").style.display = "none";             
+            // show transcript and summarise elements
+            document.getElementById("transcript-ready").style.display = "block";
+            document.getElementById("previous-transcripts").style.display = "block";
             document.getElementById("summary-description").textContent = "Press the 'Summarise' button below.";
+            
             const transcript = data.transcript || "Transcription failed: " + data.error;
             document.querySelector("textarea[name='edited_transcript']").value = transcript;
-            transcriptMode = "Recording"
-            //document.getElementById("transcript-mode").textContent = transcriptMode;
+            
             addTranscriptToHistory(transcript, transcriptMode); 
         });
 
@@ -117,6 +125,8 @@ document.getElementById("upload-form").addEventListener("submit", async (e) => {
     e.preventDefault();
     // reset summary for new audio
     resetSummary()
+    // hide scooter
+    document.getElementById("scooter").style.display = "none";
     // start spinner
     document.getElementById("loading-spinner").style.display = "block";
     const formData = new FormData(e.target);
@@ -136,6 +146,9 @@ document.getElementById("upload-form").addEventListener("submit", async (e) => {
     // add diarization option
     diarizedSelected = getDiarizationSetting();
     formData.append("diarization", diarizedSelected); 
+    // add mode
+    transcriptMode = "Upload";
+    formData.append("mode", transcriptMode); 
 
     const response = await fetch("/transcribe", {
         method: "POST",
@@ -145,15 +158,15 @@ document.getElementById("upload-form").addEventListener("submit", async (e) => {
     const data = await response.json();
     // now that we have a response, stop spinner
     document.getElementById("loading-spinner").style.display = "none";
+    // show transcript and summarise elements
+    document.getElementById("transcript-ready").style.display = "block";
+    document.getElementById("previous-transcripts").style.display = "block";
     document.getElementById("summary-description").textContent = "Press the 'Summarise' button below.";
     const transcript = data.transcript || "Transcription failed: " + data.error;
 
     // ✅ Set value inside the textarea
     document.querySelector("textarea[name='edited_transcript']").value = transcript;
 
-    // ✅ Display current mode and update history
-    transcriptMode = "Upload";
-    //document.getElementById("transcript-mode").textContent = transcriptMode;
     addTranscriptToHistory(transcript, transcriptMode);
 });
 
@@ -204,6 +217,7 @@ document.getElementById("email-form").addEventListener("submit", async (e) => {
     setTimeout(() => {
         resultStatus.style.display = "none";
         document.getElementById("email-popup").style.display = "none";
+        document.getElementById("main-content").style["backdrop-filter"] = "none";
     }, fadeOutTime);
 })
 
@@ -267,6 +281,8 @@ document.getElementById("transcript-edit").addEventListener("submit", async (e) 
     } else if (action === "email") {
         // change display of pop up to block
         document.getElementById("email-popup").style.display = "block";
+        // blur main content TODO: this doesn't work
+        //document.getElementById("main-content").style["backdrop-filter"] = "blur(5px)";
         // listener is defined above
     }
 });
@@ -307,6 +323,13 @@ document.getElementById("reset-page").addEventListener("click", () => {
     // Reset diarization toggle if needed
     const diarizationToggle = document.getElementById("diarization");
     if (diarizationToggle) diarizationToggle.checked = false;
+
+    // hide transcript results elements    
+    document.getElementById("transcript-ready").style.display = "none";
+    document.getElementById("previous-transcripts").style.display = "none";
+
+    // bring scooter back
+    document.getElementById("scooter").style.display = "block";
 
     // Reset any custom state variables
     transcriptMode = "";    

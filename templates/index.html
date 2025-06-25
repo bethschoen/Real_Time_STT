@@ -33,82 +33,96 @@
         <input type="checkbox" id="diarization" name="diarization" />
         <span class="slider"></span>
       </label>
-    </div>
+    </div><br><br>
+    <!-- list audio link -->
+    <a style="padding: 20px" href="{{ url_for('list_audio') }}">View All Recordings</a>
   </div>
 
   <!-- main page content -->
   <div style="margin-left:15%">
-
-    <h1 style="text-align: center;">Audio Transcription</h1>
-    <div class="container">
-      <div class="box left-box">
-        <h2>Upload Audio</h2>
-        <form id="upload-form" enctype="multipart/form-data">
-            <input type="file" name="audio" accept="audio/*" required />
-            <button type="submit">Transcribe</button>
-        </form>
-      </div>
-      <div class="box right-box">
-        <h2>Record Audio</h2>
-        <button id="record-btn">Start Recording</button>
-        <button id="stop-btn" disabled>Stop & Transcribe</button>
-      </div>
-    </div>
-
-    <div id="loading-spinner" style="display: none;">
-      <p style="text-align: center;">Transcribing...</p>
-      <div class="spinner"></div>
-    </div><br><br>
-
-    <div class="results-container">
-      <div class="transcriptions box left-box">
-          <h2>Transcript</h2>
-          <form id="transcript-edit" enctype="multipart/form-data">
-            <label for="edited_transcript">Edit before saving</label><br><br>
-            <textarea name="edited_transcript"></textarea><br>       
-            <div class="buttons">
-              <!-- save -->
-              <button type="submit" name="action" value="save">Save</button>    
-              <!-- email -->
-              <button type="submit" name="action" value="email">Email</button>           
-              <!-- summarise -->
-              <button type="submit" name="action" value="summarise">Summarise</button>
-            </div>     
+    <div id="main-content">
+      <h1 style="text-align: center;">Audio Transcription</h1>
+      <div class="container">
+        <div class="box left-box">
+          <h2>Upload Audio</h2>
+          <form id="upload-form" enctype="multipart/form-data">
+              <input type="file" name="audio" accept="audio/*" required />
+              <button type="submit">Transcribe</button>
           </form>
-          <p id="save-status" style="display: none; color: green; font-weight: bold;">
-          Saved!
-          </p>
-          <p id="save-error" style="display: none; color: red; font-weight: bold;">
-          Failed to save. Please try again.
-          </p>
+        </div>
+        <div class="box right-box">
+          <h2>Record Audio</h2>
+          <button id="record-btn">Start Recording</button>
+          <button id="stop-btn" disabled>Stop & Transcribe</button>
+        </div>
+      </div><br><br>
+
+      {% if cat_image %}
+        <div id="scooter" class="cat-placeholder">
+          <img src="{{ cat_image }}" alt="Scooter!">
+        </div>
+      {% endif %}
+
+      <div id="loading-spinner" style="display: none;">
+        <p style="text-align: center;">Transcribing...</p>
+        <div class="spinner"></div>
+      </div><br><br>
+      
+      <div id="transcript-ready" style="display: none;">
+        <div id="results-container", class="results-container">
+          <div class="transcriptions box left-box">
+            <h2>Transcript</h2>
+            <form id="transcript-edit" enctype="multipart/form-data">
+              <label for="edited_transcript">Edit before saving</label><br><br>
+              <textarea name="edited_transcript"></textarea><br>       
+              <div class="buttons">
+                <!-- save -->
+                <button type="submit" name="action" value="save">Save</button>    
+                <!-- email -->
+                <button type="submit" name="action" value="email">Email</button>           
+                <!-- summarise -->
+                <button type="submit" name="action" value="summarise">Summarise</button>
+              </div>     
+            </form>
+            <p id="save-status" style="display: none; color: green; font-weight: bold;">
+            Saved!
+            </p>
+            <p id="save-error" style="display: none; color: red; font-weight: bold;">
+            Failed to save. Please try again.
+            </p>
+          </div>
+          <div class="summarise box right-box">
+            <!-- title -->
+            <h2>Summary</h2>
+            <p id="summary-description-title" style="display: block;"><strong>Use AI to summarise the transcription.</strong></p>
+            <p id="summary-description" style="display: block;">Transcribe an audio file to summarise.</p>
+            <!-- spinner -->
+            <div id="loading-spinner-summarise" style="display: none;">
+              <p style="text-align: center;">Summarising...</p>
+              <div class="spinner"></div>
+            </div><br><br>
+            <!-- summary -->
+            <p id="summary-result" name=summary_result style="display: none;"></p>
+          </div>   
+        </div>   
+      </div><br><br>
+
+      <div id="previous-transcripts" class="box previous-transcripts" style="display: none;">
+        <h3>Previous Transcripts</h3>
+        <ul id="transcript-history"></ul>
       </div>
-      <div class="summarise box right-box">
-        <!-- title -->
-        <h2>Summary</h2>
-        <p id="summary-description-title" style="display: block;"><strong>Use AI to summarise the transcription.</strong></p>
-        <p id="summary-description" style="display: block;">Transcribe an audio file to summarise.</p>
-        <!-- spinner -->
-        <div id="loading-spinner-summarise" style="display: none;">
-          <p style="text-align: center;">Summarising...</p>
-          <div class="spinner"></div>
-        </div><br><br>
-        <!-- summary -->
-        <p id="summary-result" name=summary_result style="display: none;"></p>
-      </div>      
-    </div><br><br>
+    <!-- end of main content -->
+    </div>
 
     <div id="email-popup", class="box email-popup" style="display: none;">
-        <form id="email-form" enctype="multipart/form-data">
-          <p>Please provide an email address</p>
-          <input style="justify-content: fill;" type="text" id="user_email" name="user_email">
-          <button type="submit">Send</button>
-        </form>
-        <p id="email-sent-msg" style="top: 50%; left: 50%; display: none;"></p>
-    </div>
-
-    <div class="box previous-transcripts">
-      <h3>Previous Transcripts</h3>
-      <ul id="transcript-history"></ul>
+      <span onclick="this.parentElement.style.display='none'"
+      class="email-close-button">&#10006;</span>
+      <form id="email-form" enctype="multipart/form-data">
+        <p>Please provide an email address</p>
+        <input style="justify-content: fill; border: 1px solid #0d1846; border-radius: 3px;" type="text" id="user_email" name="user_email">
+        <button type="submit">Send</button>
+      </form>
+      <p id="email-sent-msg" style="top: 50%; left: 50%; display: none;"></p>
     </div>
   </div>
 

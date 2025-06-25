@@ -1,4 +1,5 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, url_for, render_template, request, jsonify
+import random
 import azure.cognitiveservices.speech as speechsdk
 import os
 from datetime import datetime
@@ -29,11 +30,18 @@ class Logger:
 
 logger = Logger()
 
+def select_scooter_pic():
+    selected_pic = random.choice(vr.scooter_pics)
+    pic_path = f"{vr.scooter_pics_dir}/{selected_pic}"
+
+    return pic_path
+
 @app.route("/")
 def index():
     logger.info("Page loaded")
-    return render_template("index.html")
-    #return "Hello from flask"
+    scooter_pic = select_scooter_pic()
+    image_url = url_for('static', filename=scooter_pic)
+    return render_template("index.html", cat_image=image_url)
 
 def convert_audio_to_wav(audio_path: str, save_path: str):
 
@@ -199,20 +207,37 @@ def transcribe():
     logger.info("Start transcribe route...")
     # access uploaded audio and save locally
     file = request.files["audio"]
+    mode = request.form.get("mode")
+
+    if mode == "Recording":
+        # save in recording directory
+        n_existing_files = len(os.listdir(vr.recorded_audio_dir))
+        filename = vr.incoming_recording_filename
+        base_path = vr.recorded_audio_dir
+        converted_filename = vr.recording_file_name.format(n_existing_files + 1)
+    elif mode == "Upload":
+        # save in temp directory  
+        filename = vr.temp_filename
+        base_path = vr.temp_upload_dir
+        converted_filename = vr.converted_filename
+    else:
+        return jsonify({"error":f"mode '{mode}' not recognised."}), 400    
     
-    file.save(vr.input_path)
+    # save locally
+    input_path = os.path.join(base_path, filename)
+    file.save(input_path)
     logger.info("Audio stored locally")  
 
     # Check if conversion is needed
     original_filename = file.filename.lower()      
     needs_conversion = not original_filename.endswith(".wav")
-    if needs_conversion:
-        
-        convert_audio_to_wav(vr.input_path, vr.converted_path)
-        audio_path = vr.converted_path
+    if needs_conversion:        
+        conversion_path = os.path.join(base_path, converted_filename)
+        convert_audio_to_wav(input_path, conversion_path)
+        audio_path = conversion_path
     else:
+        audio_path = input_path
         logger.info("Uploaded file is already a WAV file. No conversion needed.")
-        audio_path = vr.input_path
 
     # Transcribe with Azure
     language = request.form.get("language_setting")
@@ -229,11 +254,13 @@ def transcribe():
         after = time.time()
     logger.info(f"Audio transcribed, Time elapsed: {after-before}s")
     
-    # Remove audio locally
-    os.remove(vr.input_path)
-    if needs_conversion:
+    # If upload, remove audio locally
+    if mode == "Upload":
         os.remove(audio_path)
-    logger.info("Audio removed locally")
+    # If a file was converted, remove the original
+    if needs_conversion:
+        os.remove(input_path)
+        logger.info("Audio removed locally")
 
     if len(recognized_speech) < 5:
         return jsonify({"error": "No information returned from Azure Speech Services. Something went wrong..."}), 400
@@ -380,12 +407,11 @@ def send_email():
         error = "Couldn't send email: " + str(e)
         logger.info(error)
         return jsonify({"error": error}), 400
+    
+@app.route("/list-audio")
+def list_audio():
+    recordings = os.listdir(vr.recorded_audio_dir)
+    return render_template("audio_page.html", recordings=recordings)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
-
-
-
-
-
-
