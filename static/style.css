@@ -90,6 +90,7 @@ body {
 
 .reset-button {
   margin-left: 20px;
+  font-family: 'Montserrat', sans-serif;
 }
 
 .dropdown {
@@ -263,10 +264,49 @@ textarea {
   top: 5px;
   right: 5px;
   height: 10px;
+  cursor: pointer;
 }
 
 .previous-transcripts {
   margin-left: 150px;
   margin-right: 150px;
   justify-content: space-between;
+}
+
+table, th, td {
+  border: none;
+  border-collapse: collapse;
+  margin-left: 20%;
+  margin-right: 20%;
+  margin-top: 20px;
+}
+th, td {
+  padding: 5px;
+}
+th {
+  text-align: left;
+}
+
+button.delete-button {
+  all: unset; /* ← wipes out most inherited styles */
+  cursor: pointer;
+  color: #0079c8;
+}
+
+.download-link {  
+  color: #0079c8;
+}
+
+.button-link {
+    background-color: #0079c8;
+    border: none;
+    color: white;
+    padding: 8px 16px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 12px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 5px;
 }

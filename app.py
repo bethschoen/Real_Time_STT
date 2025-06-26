@@ -410,8 +410,29 @@ def send_email():
     
 @app.route("/list-audio")
 def list_audio():
+    # add id to know which row to delete
+    # recordings = {i:recording for i, recording in enumerate(os.listdir(vr.recorded_audio_dir))}
     recordings = os.listdir(vr.recorded_audio_dir)
-    return render_template("audio_page.html", recordings=recordings)
+    n_recordings = len(recordings)
+    if n_recordings == 0:
+        logger.info("No recordings saved locally.")
+        n_recordings = -1
+    return render_template("audio_page.html", recordings=recordings, n_recordings=n_recordings)
+
+@app.route("/delete-recording", methods=["POST"])
+def delete_recording():
+    filename = request.form.get("filename")
+
+    try:
+        file_path = os.path.join(vr.recorded_audio_dir, filename)
+        os.remove(file_path)
+        logger.info(f"File '{filename}' deleted successfully!")
+        return jsonify({"success": "Success!"}), 200
+    except Exception as e:
+        error = "Couldn't delete file: " + str(e)
+        logger.info(error)
+        return jsonify({"error": error}), 400
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)

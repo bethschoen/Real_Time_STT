@@ -4,37 +4,55 @@
     <meta charset="UTF-8" />
     <title>Recordings</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 </head>
 
 <div style="margin-top: 20px;"></div>
 <body>
-    <h1>List</h1>
-    <table id="recording-list">
-        <tr>
-            <th>File</th>
-            <th>Delete</th>
-        </tr>
-    </table>    
-    <!-- download links for recordings-->
-    {% if recordings %}
-        <script>
-            const recordingTable = document.getElementById("recording-list");
-            const recordingsList = {{ recordings | tojson }};
-            recordingsList.forEach(item => {
-                const tr = document.createElement("tr");
-                const link = document.createElement("a");
-                link.href = `/static/recorded_audio/${item}`;
-                link.textContent = item;
-                link.download = item;
-                tr.appendChild(link);
-                recordingTable.appendChild(link);
-            });
-        </script>
-    {% endif %}
+    <h1 style="text-align: center;">Saved Recordings</h1>
 
-    <!-- empty folder button -->
-    <br><br><button id="delete-recordings" class="reset-button" type="button"><strong>Delete Recordings</strong></button>
-  
+    <!-- side bar -->
+    <div class="sidebar" style="width:15%">
+        <!-- home link -->
+        <a class="button-link" style="margin: 20px" href="{{ url_for('index') }}">
+            <!-- <span class="material-icons">arrow_back</span> -->
+            Return
+        </a>
+        <!-- empty folder button -->
+        <br><button id="delete-recordings" class="reset-button" type="button">Delete All</button>
+    </div>
+
+    <!-- main page content -->
+    <div style="margin-left:15%">
+        <!-- delete error message -->
+        <p id="delete-error" style="display: none; color: red; font-weight: bold;">
+            Failed to delete.
+        </p>
+        <p id="empty-table" style="display: none; font-weight: bold; text-align: center;">
+            No audio saved.
+        </p>
+        <table id="recording-list">
+            <colgroup>
+                <col span="1" style="width: 70%;">
+                <col span="1" style="width: 15%;">
+                <col span="1" style="width: 15%;">
+            </colgroup>
+            <tr>
+                <th>File</th>
+                <th>Download</th>
+                <th>Delete</th>
+            </tr>
+        </table>    
+
+        <!-- list of recordings needed to populate the table (completed in js) -->
+        {% if n_recordings %}
+            <script>
+                const recordingsSaved = {{ n_recordings }};
+                const recordingsList = {{ recordings | tojson }};
+            </script>
+        {% endif %}
+    </div>
+
     <script src="{{ url_for('static', filename='audio_script.js') }}"></script>
 </body>
 </html>

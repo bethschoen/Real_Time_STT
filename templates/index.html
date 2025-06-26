@@ -12,9 +12,11 @@
   <!-- side bar -->
   <div class="sidebar" style="width:15%">
     <!-- reset button -->
-    <br><br><button id="reset-page" class="reset-button" type="button"><strong>Reset page</strong></button><br><br>
+    <br><br><button id="reset-page" class="reset-button" type="button">Reset page</button>
+    <!-- list audio link -->
+    <br><a class="button-link" style="margin: 20px" href="{{ url_for('list_audio') }}">View All Recordings</a>
     <!-- language select -->
-    <div class="dropdown">
+    <br><div class="dropdown">
       <label for="language_setting"><strong>Select language</strong></label><br><br>
       <select name="language_setting" id="language-setting">
         <option value="en-GB">English (United Kingdom)</option>
@@ -25,7 +27,7 @@
         <option value="it-IT">Italian (Italy)</option>
         <option value="es-ES">Spanish (Spain)</option>
       </select>
-    </div><br><br>
+    </div><br>
     <!-- diarization switch -->
     <div class="toggle-container">
       <strong>Diarize conversation</strong><br><br>
@@ -33,9 +35,7 @@
         <input type="checkbox" id="diarization" name="diarization" />
         <span class="slider"></span>
       </label>
-    </div><br><br>
-    <!-- list audio link -->
-    <a style="padding: 20px" href="{{ url_for('list_audio') }}">View All Recordings</a>
+    </div>
   </div>
 
   <!-- main page content -->

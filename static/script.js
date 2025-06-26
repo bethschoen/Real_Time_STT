@@ -129,6 +129,7 @@ document.getElementById("upload-form").addEventListener("submit", async (e) => {
     document.getElementById("scooter").style.display = "none";
     // start spinner
     document.getElementById("loading-spinner").style.display = "block";
+    // e.target is the thing that triggered the event (e.g. the button) or anything inside the butotn (e.g. an icon)
     const formData = new FormData(e.target);
     uploadFilename = formData.get("audio").name;
 
