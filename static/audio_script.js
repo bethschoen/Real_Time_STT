@@ -1,3 +1,11 @@
+// ChatGPT made me this badge when we figured out why audio wasn't playing 
+// (it was because I was calling audio.textContent = ... which removed all other attributes)
+/*
+  /\_/\    💻
+ ( o.o )   🎉  You squashed a sneaky DOM bug!
+  > ^ <    🐾  Your code purrs beautifully now.
+*/
+
 // function for deleting one recording 
 // 1. functions making flask calls must be async
 async function deleteRecording(fileToDelete) {

@@ -1,0 +1,19 @@
+version: '3.9'
+
+services:
+  transcriber:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      FLASK_APP: app.py
+      FLASK_RUN_HOST: 0.0.0.0
+      FLASK_ENV: production
+      AZURE_OPENAI_ENDPOINT_4O: ${AZURE_OPENAI_ENDPOINT_4O}
+      AZURE_OPENAI_KEY_4O: ${AZURE_OPENAI_KEY_4O}
+      GMAIL_PASSWORD: ${GMAIL_PASSWORD}
+      GMAIL_ADDRESS: ${GMAIL_ADDRESS}
+      SPEECH_KEY: ${SPEECH_KEY}
+    command: flask run

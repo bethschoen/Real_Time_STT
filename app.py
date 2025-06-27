@@ -4,7 +4,7 @@ import azure.cognitiveservices.speech as speechsdk
 import os
 from datetime import datetime
 from dotenv import load_dotenv
-load_dotenv()
+#load_dotenv()
 import subprocess
 import pandas as pd
 from time import gmtime, strftime
@@ -15,6 +15,7 @@ import ssl
 
 import variables as vr
 FFMPEG_PATH = r"ffmpeg.exe"
+FFMPEG_PATH = os.path.join(os.path.dirname(__file__), "ffmpeg")
 
 app = Flask(__name__)
 
@@ -172,7 +173,7 @@ def speech_transcription_with_diarization(filename: str, language: str="en-GB"):
 
     def conversation_transcriber_transcribed_cb(evt: speechsdk.SpeechRecognitionEventArgs):
         if evt.result.reason == speechsdk.ResultReason.RecognizedSpeech:
-            final_transcription.append(f"{evt.result.speaker_id.replace("Guest", "Speaker")}: {evt.result.text}")
+            final_transcription.append(f"{evt.result.speaker_id.replace('Guest', 'Speaker')}: {evt.result.text}")
         elif evt.result.reason == speechsdk.ResultReason.NoMatch:
             logger.info('\tNOMATCH: Speech could not be TRANSCRIBED: {}'.format(evt.result.no_match_details))
 
