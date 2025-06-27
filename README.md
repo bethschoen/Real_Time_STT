@@ -1,24 +1,29 @@
 # (Almost) Real-Time Speech-to-Text Transcription
-This app is for transcribing audio via Azure Speech Services. The app allows you to either upload audio files or record audio using your device's microphone. 
+This app is for transcribing audio via Azure Speech Services. The app allows you to either upload audio files or record audio using the device's microphone. 
 
-<img src="images/Screenshot%202025-06-18.png" alt="drawing" width="1000"/>
+<img src="images/250627%20App%20Demo.gif" alt="drawing" width="1000"/>
 
-Once an audio file has been provided (via either method), the app presents a spinner to show the file is bring processed:
+1. Language and diarization options can be set in the left-hand sidebar.
 
-<img src="images/Screenshot%202025-06-18%20Transcribing.png" alt="drawing" width="1000"/>
+2. The user can choose to upload an audio file or record a new file. Once an audio file has been provided (via either method), the app presents a spinner to show the file is bring processed.
 
-When this has been completed, the transcription appears in a text area allowing users to edit the text in case the model has made any mistakes:
+3. The completed transcript appears in a text area allowing users to edit the text in case the model has made any mistakes.
 
-<img src="images/Screenshot%202025-06-18%20Transcript%20edit.png" alt="drawing" width="1000"/>
+4. Users can ask the app to summarise the contents of the audio. The result will appear to the right of the transcript.
 
-Finally, the transcription can be saved. Currently, the program has been setup to save this to a CSV in the project directory. Ideally, this would be a some type of tabular storage for further use. Alternatively, the transcription could be sent to the user via email.
+5. The transcription can be saved. Currently, the program has been setup to save this to a CSV in the project directory. Ideally, this would be a some type of tabular storage for further use.
 
-<img src="images/Screenshot%202025-06-18%20Transcriptions.png" alt="drawing" width="1000"/>
+6. The session can be emailed to the user. Clicking the email button, a pop-up will appear requesting a email address. The user will then receive the transcription, summary, and settings: 
+
+<img src="images/Screenshot%202025-06-27%20Email.png" alt="drawing" width="1000"/>
+
+7. If the user has made any recordings, they are listed at `/list-audio`. The user can choose to download or delete files. Currently, the files are saved in the project directory. Ideally, this would be listing cloud storage and more meta-data would be provided e.g. date and time of recording. 
+
+<img src="images/Screenshot%202025-06-27%20Listed%20recordings.png" alt="drawing" width="1000"/>
 
 Some error handling has been considered during development: the API handles errors received from Azure Speech Services; nothing will be saved if the text area is empty; if anything goes wrong while saving a transcription, the error message appears at the bottom.
 
 <img src="images/Screenshot%202025-06-18%20error%20handling.png" alt="drawing" width="1000"/>
-
 
 ## Project Files
 
@@ -28,11 +33,16 @@ To achieve this, we have the following file structure:
 real-time-stt
 |
 ├── templates
-|   └── index.html
+|   ├── index.html
+|   └── audio_page.html
 |
 ├── static
+|   ├── recorded_audio
+|   |   └── (recorded audio as wav files)
+|   |
 |   ├── style.css
-|   └── script.js
+|   ├── script.js
+|   └── audio_script.js
 |
 └── app.py
 ```
@@ -40,9 +50,10 @@ real-time-stt
 Each file serves a different purpose:
 
 - **app.py**: Flask API connecting app to Azure Speech Services (backend)
-- **script.js**: functionality of frontend, connecting actions to the backend
-- **index.html**: layout of frontend
+- **script.js**: functionality of frontend (main page), connecting actions to the backend
+- **index.html**: layout of frontend (main page)
 - **style.css**: design of frontend
+- **audio_script.js** and **audio_page.html**: layout and functionality of the second page
 
 ##  Limitations
 This demo lets users record or upload audio and see a transcript almost immediately. When a user records audio, JavaScript is used to access the microphone and create a recording, this is saved in memory to be sent as an uploaded file to Azure. Therefore, **transcriptions aren't live but are almost real-time**. 
