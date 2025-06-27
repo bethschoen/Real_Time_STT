@@ -284,7 +284,10 @@ th, td {
   padding: 5px;
 }
 th {
-  text-align: left;
+  text-align: center;
+}
+td {
+  text-align: center;
 }
 
 button.delete-button {

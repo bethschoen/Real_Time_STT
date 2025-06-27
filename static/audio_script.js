@@ -48,11 +48,24 @@ document.addEventListener("DOMContentLoaded", () => {
             const tdFile = document.createElement("td");
             tdFile.textContent = item;
             tr.appendChild(tdFile);
+            const audioLocation = `/static/recorded_audio/${item}`;
+            console.log(audioLocation)
+            // # playback # //
+            const tdAudio = document.createElement("td");
+            const audio = document.createElement("audio");
+            audio.preload = "metadata";
+            audio.controls = true;
+            const source = document.createElement("source");
+            source.src = audioLocation;
+            source.type = "audio/wav";
+            audio.appendChild(source);
+            tdAudio.appendChild(audio);
+            tr.appendChild(tdAudio);
             // # download link # //
             const tdDownload = document.createElement("td");
             const link = document.createElement("a");
             // location of file locally
-            link.href = `/static/recorded_audio/${item}`;
+            link.href = audioLocation;
             link.download = item;
             // icon - uses Google available ones
             link.innerHTML = `<span class="material-icons">file_download</span>`;

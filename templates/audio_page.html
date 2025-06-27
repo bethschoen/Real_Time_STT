@@ -9,8 +9,6 @@
 
 <div style="margin-top: 20px;"></div>
 <body>
-    <h1 style="text-align: center;">Saved Recordings</h1>
-
     <!-- side bar -->
     <div class="sidebar" style="width:15%">
         <!-- home link -->
@@ -23,7 +21,8 @@
     </div>
 
     <!-- main page content -->
-    <div style="margin-left:15%">
+    <div style="margin-left:15%">        
+        <h1 style="text-align: center;">Saved Recordings</h1><br>
         <!-- delete error message -->
         <p id="delete-error" style="display: none; color: red; font-weight: bold;">
             Failed to delete.
@@ -33,12 +32,14 @@
         </p>
         <table id="recording-list">
             <colgroup>
-                <col span="1" style="width: 70%;">
+                <col span="1" style="width: 30%;">
+                <col span="1" style="width: 40%;">
                 <col span="1" style="width: 15%;">
                 <col span="1" style="width: 15%;">
             </colgroup>
             <tr>
                 <th>File</th>
+                <th>Playback</th>
                 <th>Download</th>
                 <th>Delete</th>
             </tr>
