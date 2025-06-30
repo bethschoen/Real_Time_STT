@@ -1,14 +1,12 @@
 import azure.cognitiveservices.speech as speechsdk
 import os
-from dotenv import load_dotenv
-load_dotenv()
 import subprocess
 import time
 import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import variables as vr
-from app import logger
+from log import logger
 
 def convert_audio_to_wav(audio_path: str, save_path: str):
 

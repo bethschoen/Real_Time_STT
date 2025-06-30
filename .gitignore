@@ -3,4 +3,4 @@ ffmpeg.exe
 audio/bee_movie.wav
 audio/deutsches_audio.wav
 ffmpeg
-app/logs/
+log/logs/

@@ -12,7 +12,7 @@ import ssl
 import uuid
 
 import variables as vr
-from app import logger
+from log import logger
 import utils as ut
 
 def handle_error(msg: str, e: Exception=None):

@@ -1,7 +1,7 @@
 from openai import AzureOpenAI
 import os
 
-from app import logger
+from log import logger
 
 def generate_text(model: str, messages: list):
     
