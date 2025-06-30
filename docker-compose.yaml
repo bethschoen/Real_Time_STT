@@ -16,4 +16,5 @@ services:
       GMAIL_PASSWORD: ${GMAIL_PASSWORD}
       GMAIL_ADDRESS: ${GMAIL_ADDRESS}
       SPEECH_KEY: ${SPEECH_KEY}
+      SPEECH_ENDPOINT: ${SPEECH_ENDPOINT}
     command: flask run
